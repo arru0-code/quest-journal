@@ -1,0 +1,2623 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Журнал заданий</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alegreya+SC:wght@500;700;800;900&family=Alegreya:ital,wght@0,400;0,500;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --night:#07050a; --night2:#1a1210;
+  --frame:#1a120b; --frame-edge:#060403;
+  --gold:#ffd100; --gold-hi:#fff0a8; --gold-dim:#c9a646; --gold-deep:#8a6a1e; --bronze:#5c4415;
+  --leather:#20150d; --leather2:#140d07;
+  --parch:#ead3a2; --parch-hi:#f6e8c4; --ink:#2e1a08; --ink-soft:#5e4121; --ink-head:#3b1d04;
+  --btn:#a11f12; --btn2:#4a0903;
+  --d0:#9d9d9d; --d1:#40c040; --d2:#ffd100; --d3:#ff8040; --d4:#ff3b2b;
+  --xp:#9a3fd0; --rested:#3a6fe0;
+  --serif:"Alegreya","Palatino Linotype","Book Antiqua",Georgia,serif;
+  --caps:"Alegreya SC","Palatino Linotype",Georgia,serif;
+  --ease-out:cubic-bezier(.2,.8,.2,1);
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --night:#040305; --night2:#130d0b; } }
+:root[data-theme="dark"]{ --night:#040305; --night2:#130d0b; }
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%; scroll-padding-top:env(safe-area-inset-top,0px)}
+body{
+  margin:0; min-height:100%; font-family:var(--serif); color:var(--parch); background:var(--night);
+  background-image:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255,150,60,.10), transparent 60%),
+    radial-gradient(ellipse at 50% 30%, var(--night2) 0%, var(--night) 80%);
+  background-attachment:fixed; overflow-x:hidden;
+}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--gold); outline-offset:2px}
+#embers{position:fixed; inset:0; width:100%; height:100%; pointer-events:none; z-index:0}
+
+.layout{position:relative; z-index:1; display:flex; gap:26px; justify-content:center; align-items:flex-start; padding:46px 16px 40px}
+.col{width:100%; max-width:1000px; min-width:0; animation:rise .7s var(--ease-out) both}
+@keyframes rise{from{opacity:0; transform:translateY(18px) scale(.985)} to{opacity:1; transform:none}}
+
+/* ---------- Frame ---------- */
+.frame{
+  position:relative; border-radius:8px;
+  background:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .35 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"),
+    linear-gradient(180deg,#2e2016,#1a120b 40%,#120c07);
+  border:4px solid transparent;
+  background-clip:padding-box;
+  box-shadow:
+    0 0 0 1px #000,
+    0 0 0 3px #b8912f, 0 0 0 4px #6b4f14, 0 0 0 6px #e8c766, 0 0 0 7px #3a2a0a, 0 0 0 9px #0b0703,
+    0 25px 70px rgba(0,0,0,.75), 0 0 120px rgba(255,140,40,.07);
+}
+.corner{position:absolute; width:46px; height:46px; pointer-events:none; z-index:4; filter:drop-shadow(0 2px 2px rgba(0,0,0,.8))}
+.corner.tl{left:-14px; top:-14px} .corner.tr{right:-14px; top:-14px; transform:scaleX(-1)}
+.corner.bl{left:-14px; bottom:-14px; transform:scaleY(-1)} .corner.br{right:-14px; bottom:-14px; transform:scale(-1,-1)}
+
+.head{display:flex; align-items:center; gap:14px; padding:16px 18px 12px 108px; position:relative; min-height:78px;
+  border-bottom:2px solid #000; box-shadow:0 1px 0 rgba(201,166,70,.35);
+  background:linear-gradient(180deg,rgba(255,220,150,.06),transparent)}
+.sigil{
+  position:absolute; left:6px; top:-30px; width:92px; height:92px; border-radius:50%; z-index:5;
+  background:radial-gradient(circle at 42% 34%, #6d4520, #2a180a 62%, #120a04);
+  box-shadow:0 0 0 3px #e8c766, 0 0 0 5px #6b4f14, 0 0 0 7px #0b0703, 0 8px 18px rgba(0,0,0,.7), inset 0 0 18px rgba(0,0,0,.9);
+  display:grid; place-items:center; overflow:hidden;
+}
+.sigil::before{content:""; position:absolute; inset:0; background:radial-gradient(circle at 50% 60%, rgba(255,200,60,.35), transparent 60%); animation:pulse 3.2s ease-in-out infinite}
+.sigil span{position:relative; font-family:var(--caps); font-weight:900; font-size:66px; line-height:1; color:var(--gold);
+  -webkit-text-stroke:1.5px #3b2400; text-shadow:0 3px 0 #6a4a00, 0 0 22px rgba(255,209,0,.6); animation:bob 2.6s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-4px)}}
+@keyframes pulse{50%{opacity:.45}}
+.banner{
+  position:relative; padding:6px 34px 7px; font-family:var(--caps); font-weight:800; font-size:1.5rem; color:var(--gold);
+  text-shadow:0 2px 0 #000, 0 0 12px rgba(255,180,0,.35); letter-spacing:.02em;
+  background:linear-gradient(180deg,#8d1a10,#57100a 55%,#3a0904);
+  clip-path:polygon(14px 0,calc(100% - 14px) 0,100% 50%,calc(100% - 14px) 100%,14px 100%,0 50%);
+}
+.banner::before{content:""; position:absolute; inset:2px; clip-path:inherit; border:0;
+  background:linear-gradient(180deg,rgba(255,220,120,.25),transparent 40%); pointer-events:none}
+.banner-wrap{filter:drop-shadow(0 0 0 #e8c766) drop-shadow(0 0 1px #e8c766) drop-shadow(0 3px 3px rgba(0,0,0,.7))}
+.head .count{color:var(--gold-dim); font-size:.92rem; order:5; flex-basis:100%; margin:-8px 0 0 4px}
+.head{flex-wrap:wrap; row-gap:10px}
+.banner,.hbtn,.syncbtn{white-space:nowrap}
+.head .spacer{flex:1}
+.hbtn{background:linear-gradient(180deg,#3b2a1b,#1f150c); border:1px solid var(--gold-deep); border-radius:4px; min-height:34px; padding:0 10px; cursor:pointer; color:var(--gold-dim); font-family:var(--caps); font-weight:700; display:inline-flex; align-items:center; gap:6px}
+.hbtn:hover{color:var(--gold); border-color:var(--gold-dim)}
+.syncbtn{border-radius:14px; min-height:30px; padding:0 12px; cursor:pointer; font-size:.88rem; white-space:nowrap; border:1px solid; background:rgba(0,0,0,.35); text-shadow:1px 1px 0 #000}
+.syncbtn.ok{color:#9fd68a; border-color:#3f7a22}
+.syncbtn.busy{color:#a9c6ff; border-color:#3a5a9a}
+.syncbtn.err{color:#ffb08a; border-color:#9b3a1a; background:rgba(120,30,10,.35)}
+.syncbtn:hover{filter:brightness(1.25)}
+.roundx{width:30px; height:30px; border-radius:50%; border:0; cursor:pointer; display:grid; place-items:center; color:#ffe7a0;
+  background:radial-gradient(circle at 40% 35%, #d93a22, #7a0f06 70%); box-shadow:0 0 0 2px #e8c766, 0 0 0 3px #3a2a0a, 0 2px 4px rgba(0,0,0,.7)}
+.roundx:hover{filter:brightness(1.2)}
+
+.body{display:grid; grid-template-columns:minmax(270px,37%) 1fr; min-height:540px}
+.body.page-mode{grid-template-columns:1fr}
+
+/* ---------- Scrollbars ---------- */
+.list,.detail,.page,.sheet{scrollbar-width:thin; scrollbar-color:#b8912f rgba(0,0,0,.25)}
+::-webkit-scrollbar{width:10px} ::-webkit-scrollbar-track{background:rgba(0,0,0,.3)}
+::-webkit-scrollbar-thumb{background:linear-gradient(90deg,#6b4f14,#e8c766,#6b4f14); border-radius:6px; border:2px solid rgba(0,0,0,.4)}
+
+/* ---------- Quest list ---------- */
+.list{
+  background:
+    radial-gradient(ellipse at 30% 0%, rgba(255,200,120,.06), transparent 60%),
+    linear-gradient(180deg,var(--leather),var(--leather2));
+  border-right:2px solid #000; box-shadow:inset -1px 0 0 rgba(201,166,70,.25), inset 0 0 30px rgba(0,0,0,.6);
+  overflow-y:auto; max-height:660px; padding:10px 6px 18px; position:relative;
+}
+.zone{margin-bottom:4px}
+.zone-h{display:flex; align-items:center; gap:8px; width:100%; background:none; border:0; cursor:pointer;
+  padding:6px 8px; text-align:left; color:var(--gold); font-family:var(--caps); font-weight:700; font-size:1.05rem; text-shadow:1px 1px 0 #000}
+.zone-h.later{color:#c9b28a; font-style:italic}
+.zone-h .pm{width:17px; height:17px; border-radius:3px; display:grid; place-items:center; font-family:var(--serif); font-size:14px; line-height:1; flex:none; color:#fff3c0;
+  background:linear-gradient(180deg,#8a6a1e,#4a3508); box-shadow:0 0 0 1px #000, inset 0 1px 0 rgba(255,240,180,.4)}
+.zone-h:hover{text-shadow:1px 1px 0 #000, 0 0 10px rgba(255,209,0,.6)}
+.q{display:flex; align-items:baseline; gap:8px; width:100%; background:none; border:0; border-radius:3px; cursor:pointer;
+  padding:5px 8px 5px 34px; text-align:left; font-size:1.04rem; line-height:1.3; position:relative; text-shadow:1px 1px 0 #000; touch-action:pan-y}
+.q:hover{background:linear-gradient(90deg,rgba(255,255,255,.08),rgba(255,255,255,.01))}
+.q.sel{background:linear-gradient(90deg, rgba(255,209,0,.22), rgba(255,209,0,.02)); box-shadow:inset 3px 0 0 var(--gold)}
+.q .t{flex:1; min-width:0}
+.q .meta{font-size:.84rem; color:#b9a27a; white-space:nowrap}
+.q .meta.warn{color:#ff9a6a}
+.q .mark{position:absolute; left:17px; top:3px; font-family:var(--caps); font-weight:900; color:var(--gold); -webkit-text-stroke:.6px #3b2400; animation:bob 2.2s ease-in-out infinite}
+.q .star{color:var(--gold); font-size:.9rem; margin-right:-2px}
+.q .grip{position:absolute; left:2px; top:50%; transform:translateY(-50%); width:14px; height:22px; cursor:grab; opacity:0; touch-action:none;
+  background:radial-gradient(circle,#c9a646 1.2px,transparent 1.6px) 0 0/7px 6px; transition:opacity .15s}
+.q:hover .grip,.q.sel .grip,.q:focus-visible .grip{opacity:.8}
+@media (hover:none){ .q .grip{opacity:.55} }
+.q.dragging{opacity:.9; background:rgba(255,209,0,.15); box-shadow:0 8px 18px rgba(0,0,0,.6), inset 0 0 0 1px rgba(255,209,0,.5); z-index:5; transition:none}
+.q.drop-before{box-shadow:inset 0 2px 0 var(--gold)} .q.drop-after{box-shadow:inset 0 -2px 0 var(--gold)}
+.q.done .t{color:#7d7061 !important; text-decoration:line-through; text-decoration-color:rgba(125,112,97,.7)}
+.d0{color:var(--d0)} .d1{color:var(--d1)} .d2{color:var(--d2)} .d3{color:var(--d3)} .d4{color:var(--d4)}
+.list-empty{padding:30px 18px; color:#b9a27a; line-height:1.55}
+
+/* ---------- Parchment ---------- */
+.parchment{
+  position:relative; color:var(--ink); background-color:var(--parch);
+  background-image:
+    radial-gradient(ellipse at 50% 35%, rgba(255,250,230,.6), transparent 62%),
+    radial-gradient(ellipse at 0% 0%, rgba(110,70,25,.35), transparent 42%),
+    radial-gradient(ellipse at 100% 0%, rgba(110,70,25,.22), transparent 38%),
+    radial-gradient(ellipse at 100% 100%, rgba(110,70,25,.38), transparent 45%),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .35  0 0 0 0 .22  0 0 0 0 .08  0 0 0 .16 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  box-shadow:inset 0 0 50px rgba(90,55,20,.55), inset 0 0 6px rgba(60,35,10,.6);
+}
+.detail{overflow-y:auto; max-height:660px; padding:28px 32px 32px}
+.detail h2,.page h2{font-family:var(--caps); font-weight:900; font-size:1.7rem; margin:0 0 4px; line-height:1.12; color:var(--ink-head); text-shadow:0 1px 0 rgba(255,245,215,.6)}
+.detail h3,.page h3{font-family:var(--caps); font-weight:800; font-size:1.2rem; margin:24px 0 6px; color:var(--ink-head); display:flex; align-items:center; gap:10px}
+.detail h3::after,.page h3::after{content:""; flex:1; height:1px; background:linear-gradient(90deg,rgba(90,55,20,.5),transparent)}
+.detail p{margin:0 0 10px; line-height:1.58; max-width:62ch; font-size:1.06rem}
+.detail .desc{white-space:pre-wrap}
+.unroll{animation:unroll .5s var(--ease-out) both}
+@keyframes unroll{from{clip-path:inset(0 0 100% 0); opacity:.4} to{clip-path:inset(0 0 0 0); opacity:1}}
+.back{display:none; background:none; border:0; color:var(--ink-soft); cursor:pointer; padding:0 0 12px; font-size:1rem}
+.tagline{display:flex; flex-wrap:wrap; gap:6px 14px; margin:6px 0 2px; font-size:.95rem; color:var(--ink-soft)}
+.late{color:#9b1a0e; font-weight:700}
+.chip{display:inline-flex; align-items:center; gap:4px}
+.stamp{display:inline-block; margin-top:10px; padding:4px 12px; border:2px solid #2f6d12; color:#2f6d12; font-family:var(--caps); font-weight:800; transform:rotate(-3deg); border-radius:3px; animation:stamp .35s var(--ease-out) both}
+@keyframes stamp{from{transform:rotate(-3deg) scale(1.6); opacity:0} to{transform:rotate(-3deg) scale(1); opacity:1}}
+.note{margin:14px 0 0; padding:10px 14px; border-left:3px solid #9b6a1e; background:rgba(155,106,30,.12); line-height:1.5; max-width:62ch}
+.parent-link{background:none; border:0; padding:0; color:#6b2a0a; cursor:pointer; text-decoration:underline; text-underline-offset:3px; font:inherit}
+.objs{list-style:none; padding:0; margin:4px 0 0}
+.objs li{display:flex; align-items:center; gap:10px; padding:5px 0; font-size:1.06rem; line-height:1.35}
+.objs .box{width:22px; height:22px; flex:none; border:2px solid #6b4a24; border-radius:3px; background:rgba(255,255,255,.35); cursor:pointer; display:grid; place-items:center; padding:0; color:#2f6d12; font-weight:800}
+.objs .box.pop{animation:pop .3s var(--ease-out)}
+@keyframes pop{50%{transform:scale(1.3)}}
+.objs li.ok .txt{color:#6f5a3e; text-decoration:line-through}
+.objs .txt{flex:1}
+.objs .ctr{display:flex; align-items:center; gap:4px; font-variant-numeric:tabular-nums; white-space:nowrap}
+.objs .ctr button{width:28px; height:28px; border:1px solid #8a6a3a; background:rgba(255,255,255,.35); border-radius:3px; cursor:pointer; line-height:1; padding:0; color:var(--ink)}
+.steps{list-style:none; padding:0; margin:0}
+.steps li{display:flex; gap:10px; align-items:baseline; padding:4px 0}
+.steps li button{background:none; border:0; padding:0; cursor:pointer; text-align:left; font:inherit; color:var(--ink); text-decoration:underline; text-decoration-color:rgba(90,55,20,.3); text-underline-offset:3px}
+.steps li.ok button{color:#6f5a3e; text-decoration:line-through}
+.steps .when{color:var(--ink-soft); font-size:.9rem; margin-left:auto; white-space:nowrap}
+.pbar{height:8px; border-radius:4px; background:rgba(90,55,20,.2); box-shadow:inset 0 1px 2px rgba(0,0,0,.3); overflow:hidden; margin:6px 0 10px; max-width:420px}
+.pbar i{display:block; height:100%; background:linear-gradient(180deg,#e0b84a,#9a7015); transition:width .6s var(--ease-out)}
+.rewards{display:flex; flex-wrap:wrap; gap:10px 18px; margin-top:6px; align-items:center}
+.slot{display:flex; align-items:center; gap:0}
+.slot .ico{width:44px; height:44px; border-radius:4px; flex:none; display:grid; place-items:center; font-family:var(--caps); font-weight:900; font-size:.95rem; position:relative; z-index:1;
+  box-shadow:0 0 0 2px #1a1008, 0 0 0 3px #b8912f, 0 2px 4px rgba(0,0,0,.5), inset 0 0 10px rgba(0,0,0,.6)}
+.slot .ico.xpg{background:radial-gradient(circle at 35% 30%, #c69cff, #5b2aa6 55%, #1f0c44); color:#fff}
+.slot .ico.rst{background:radial-gradient(circle at 35% 30%, #9cc4ff, #2a54a6 55%, #0c1a44); color:#fff}
+.slot .nm{background:linear-gradient(90deg,rgba(60,40,20,.85),rgba(60,40,20,.55)); color:#f3e3bd; padding:6px 14px 6px 14px; margin-left:-3px; border-radius:0 3px 3px 0; font-size:.98rem; min-height:36px; display:flex; align-items:center}
+.money{display:inline-flex; gap:8px; align-items:center; font-variant-numeric:tabular-nums; font-weight:700}
+.coin{display:inline-flex; align-items:center; gap:3px}
+.coin i{width:12px; height:12px; border-radius:50%; display:inline-block; box-shadow:inset -1px -1px 0 rgba(0,0,0,.35), 0 0 0 1px rgba(0,0,0,.35)}
+.coin.g i{background:radial-gradient(circle at 35% 35%,#fff3a0,#e0a800 60%,#8a6000)}
+.coin.s i{background:radial-gradient(circle at 35% 35%,#ffffff,#b9b9b9 60%,#6b6b6b)}
+.coin.c i{background:radial-gradient(circle at 35% 35%,#ffc59a,#b8672f 60%,#6b3410)}
+.empty{padding-top:40px; text-align:center}
+.empty .big{font-family:var(--caps); font-weight:900; font-size:5.4rem; color:#c79a2c; line-height:1; -webkit-text-stroke:1px #6a4a10; text-shadow:0 2px 0 rgba(255,255,255,.4); animation:bob 2.6s ease-in-out infinite}
+.empty p{margin:14px auto 18px}
+.dactions{display:flex; flex-wrap:wrap; gap:8px; margin-top:26px}
+
+/* ---------- Page mode (stats, shop) ---------- */
+.page{overflow-y:auto; max-height:760px; padding:28px 34px 34px}
+.page .lead{color:var(--ink-soft); margin:2px 0 8px; line-height:1.5; max-width:70ch}
+.statgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-top:12px}
+.stat{background:rgba(255,248,225,.35); border:1px solid rgba(110,70,25,.35); border-radius:4px; padding:10px 12px}
+.stat b{display:block; font-family:var(--caps); font-size:1.7rem; color:var(--ink-head); line-height:1.1}
+.stat span{color:var(--ink-soft); font-size:.92rem}
+.heat{display:grid; grid-auto-flow:column; grid-template-rows:repeat(7,14px); grid-auto-columns:14px; justify-content:start; gap:3px; overflow-x:auto; padding:4px 0}
+.heat i{width:14px; height:14px; border-radius:2px; background:rgba(90,55,20,.14)}
+.heat i.l1{background:#e9c46a} .heat i.l2{background:#d49b1e} .heat i.l3{background:#a8670c} .heat i.l4{background:#6e3a02}
+.heat i.today{box-shadow:0 0 0 1.5px var(--ink-head)}
+.legend{display:flex; gap:4px; align-items:center; font-size:.85rem; color:var(--ink-soft); margin-top:4px}
+.legend i{width:12px; height:12px; border-radius:2px; display:inline-block}
+.zbars{display:grid; gap:6px; max-width:520px}
+.zbar{display:grid; grid-template-columns:120px 1fr 40px; gap:10px; align-items:center; font-size:.98rem}
+.zbar .tr{height:10px; background:rgba(90,55,20,.15); border-radius:5px; overflow:hidden}
+.zbar .tr i{display:block; height:100%; background:linear-gradient(90deg,#9a7015,#e0b84a)}
+.achs{display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:10px; margin-top:8px}
+.ach{display:flex; gap:12px; align-items:center; padding:10px 12px; border-radius:4px; background:linear-gradient(90deg,rgba(40,25,10,.9),rgba(60,40,20,.8)); color:#e8dcc0; box-shadow:0 0 0 1px #000, 0 0 0 2px #8a6a1e}
+.ach.locked{filter:grayscale(1) brightness(.75); opacity:.7}
+.ach .sh{flex:none}
+.ach b{display:block; color:var(--gold); font-family:var(--caps); font-size:1.02rem}
+.ach span{font-size:.88rem; color:#cbbd9f}
+.ach .pts{margin-left:auto; font-family:var(--caps); font-weight:800; color:var(--gold-hi)}
+.shop-list{display:grid; gap:10px; margin-top:10px; max-width:700px}
+.ware{display:flex; gap:12px; align-items:center; padding:8px 10px; border-radius:4px; background:rgba(255,248,225,.35); border:1px solid rgba(110,70,25,.35)}
+.ware .ico{width:40px; height:40px; border-radius:4px; display:grid; place-items:center; font-size:1.4rem; background:radial-gradient(circle at 35% 30%,#5a3b1c,#1f130a); box-shadow:0 0 0 2px #1a1008, 0 0 0 3px #b8912f}
+.ware .nm{flex:1; font-weight:700}
+.ware .x{background:none; border:0; color:#7a1a0f; cursor:pointer; font-size:1.1rem}
+.shop-form{display:grid; grid-template-columns:1fr 90px 90px auto; gap:8px; align-items:end; max-width:700px; margin-top:12px}
+.purse{display:flex; align-items:center; gap:12px; font-size:1.2rem; margin:8px 0 2px}
+
+/* ---------- Footer + buttons ---------- */
+.foot{display:flex; flex-wrap:wrap; gap:10px; align-items:center; padding:12px 16px; border-top:2px solid #000; box-shadow:inset 0 1px 0 rgba(201,166,70,.3)}
+.foot .spacer{flex:1}
+.foot .money{color:#f3e3bd}
+.btn{
+  position:relative; background:linear-gradient(180deg,#c42a18,var(--btn) 45%,var(--btn2)); color:var(--gold);
+  border:1px solid #e0b24a; border-radius:4px; padding:7px 18px; cursor:pointer; font-family:var(--caps); font-weight:800; font-size:1rem;
+  box-shadow:inset 0 1px 0 rgba(255,220,160,.45), inset 0 -2px 4px rgba(0,0,0,.4), 0 0 0 1px #000, 0 2px 3px rgba(0,0,0,.6); text-shadow:1px 1px 0 #000; min-height:36px;
+}
+.btn:hover:not(:disabled){filter:brightness(1.22)}
+.btn:active:not(:disabled){transform:translateY(1px); filter:brightness(.95)}
+.btn:disabled{filter:grayscale(1) brightness(.55); cursor:default}
+.btn.ghost{background:linear-gradient(180deg,#4a3522,#2a1c10 50%,#1a1008); border-color:#8a6a1e}
+.btn.small{padding:4px 12px; min-height:30px; font-size:.92rem}
+.btn.glow{animation:glow 1.6s ease-in-out infinite}
+@keyframes glow{50%{box-shadow:inset 0 1px 0 rgba(255,220,160,.45), 0 0 0 1px #000, 0 0 16px 2px rgba(255,209,0,.75)}}
+.btn.ai{background:linear-gradient(180deg,#5a3aa8,#35207a 50%,#1c0f48); border-color:#b9a0ff; color:#f0e6ff}
+
+/* ---------- XP bar ---------- */
+.xp{padding:0 16px 14px}
+.xp-bar{position:relative; height:18px; border:1px solid #000; background:#120a05; box-shadow:0 0 0 1px #b8912f, 0 0 0 2px #000, inset 0 2px 4px rgba(0,0,0,.8); border-radius:2px; overflow:hidden}
+.xp-rest{position:absolute; top:0; bottom:0; left:0; width:0; background:linear-gradient(180deg,#6c9bff,#2a52b8 60%,#1a3380); opacity:.75; transition:all .8s var(--ease-out)}
+.xp-fill{position:absolute; top:0; bottom:0; left:0; width:0; background:linear-gradient(180deg,#d38cff,#8a2fc0 55%,#551580); transition:width .9s var(--ease-out); overflow:hidden}
+.xp-fill.shine::after{content:""; position:absolute; top:0; bottom:0; width:60px; background:linear-gradient(90deg,transparent,rgba(255,255,255,.7),transparent); animation:shine 1s ease-out}
+@keyframes shine{from{left:-60px} to{left:100%}}
+.xp-bar::after{content:""; position:absolute; inset:0; background:repeating-linear-gradient(90deg, transparent 0 calc(5% - 1px), rgba(0,0,0,.6) calc(5% - 1px) 5%); pointer-events:none}
+.xp-label{position:absolute; inset:0; display:grid; place-items:center; font-size:.8rem; color:#fff; text-shadow:1px 1px 0 #000,0 0 3px #000; z-index:2}
+
+/* ---------- Tabs ---------- */
+.tabs{display:flex; gap:4px; padding:0 26px; margin-top:7px; flex-wrap:wrap; position:relative; z-index:0}
+.tab{background:linear-gradient(180deg,#120c07,#2e2016); border:1px solid #000; border-top:0; box-shadow:0 0 0 1px #6b4f14, 0 3px 6px rgba(0,0,0,.6);
+  border-radius:0 0 10px 10px; padding:9px 13px 9px; cursor:pointer; color:var(--gold-dim); font-family:var(--caps); font-weight:800; font-size:1rem; text-shadow:1px 1px 0 #000; transition:padding .15s, color .15s}
+.tab:hover{color:var(--gold)}
+.tab[aria-selected="true"]{color:var(--gold); background:linear-gradient(180deg,#0e0905,#3d2a17); padding-top:14px; margin-top:-5px; box-shadow:0 0 0 1px #e8c766, 0 4px 10px rgba(0,0,0,.7)}
+.tab .n{color:#b9a27a; font-family:var(--serif); font-weight:400}
+
+/* ---------- Tracker ---------- */
+.tracker{width:270px; flex:none; padding-top:4px; position:sticky; top:calc(22px + env(safe-area-inset-top,0px)); animation:rise .7s .15s var(--ease-out) both}
+.tracker h4{margin:0 0 8px; font-family:var(--caps); font-weight:800; color:var(--gold); font-size:1.08rem; text-shadow:1px 1px 0 #000; border-bottom:1px solid rgba(201,166,70,.35); padding-bottom:5px}
+.tr-q{background:none; border:0; padding:5px 0; cursor:pointer; text-align:left; display:block; width:100%}
+.tr-q .tt{font-weight:700; color:var(--gold); text-shadow:1px 1px 0 #000}
+.tr-q.focus .tt::before{content:"★ "}
+.tr-q .oo{display:block; font-size:.92rem; color:#ece2cf; padding-left:10px; text-shadow:1px 1px 0 #000,0 0 4px #000}
+.tr-q .oo.ok{color:#8a8a8a}
+.tr-q:hover .tt{text-shadow:1px 1px 0 #000,0 0 8px rgba(255,209,0,.6)}
+.tracker .none{color:#8f826f; font-size:.92rem; line-height:1.45}
+.tracker .streak{margin-top:18px; color:#e8dcc0; font-size:.95rem; line-height:1.5; text-shadow:1px 1px 0 #000}
+.tracker .streak b{color:var(--d3); font-family:var(--caps); font-size:1.3rem}
+
+/* ---------- Dialogs ---------- */
+dialog{border:0; padding:0; background:transparent; max-width:min(640px,94vw); width:100%; color:var(--ink)}
+dialog[open]{animation:dlg .3s var(--ease-out)}
+@keyframes dlg{from{opacity:0; transform:translateY(10px) scale(.97)}}
+dialog::backdrop{background:rgba(5,3,1,.72)}
+.sheet{padding:24px 26px; border-radius:4px; max-height:88vh; overflow-y:auto;
+  box-shadow:0 0 0 2px #000, 0 0 0 4px #b8912f, 0 0 0 5px #3a2a0a, 0 0 0 7px #0b0703, inset 0 0 50px rgba(90,55,20,.5)}
+.sheet h2{margin:0 0 4px; font-family:var(--caps); font-weight:900; color:var(--ink-head); font-size:1.5rem}
+.sheet h3{font-family:var(--caps); font-weight:800; color:var(--ink-head); margin:18px 0 6px; font-size:1.12rem}
+.sheet .sub{color:var(--ink-soft); margin:0 0 14px}
+.field{margin-bottom:14px}
+.field > label, .field > .lbl{display:block; font-family:var(--caps); font-weight:800; margin-bottom:5px; color:var(--ink-head)}
+.sheet input[type=text], .sheet input[type=password], .sheet input[type=number], .sheet input[type=date], .sheet select, .sheet textarea, .page input[type=text], .page input[type=number]{
+  width:100%; background:rgba(255,250,235,.72); border:1px solid #8a6a3a; border-radius:3px; padding:8px 10px; color:var(--ink); font-size:1rem; box-shadow:inset 0 1px 3px rgba(90,55,20,.25)}
+.sheet textarea{min-height:90px; resize:vertical; line-height:1.45}
+.row{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+.row3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px}
+.diffs{display:flex; flex-wrap:wrap; gap:6px}
+.diffs label{cursor:pointer; position:relative}
+.diffs input{position:absolute; opacity:0; pointer-events:none}
+.diffs span{display:inline-block; padding:5px 11px; border-radius:3px; background:#1f150c; font-weight:700; text-shadow:1px 1px 0 #000; box-shadow:0 0 0 1px #000}
+.diffs input:checked + span{box-shadow:0 0 0 1px #000, 0 0 0 3px var(--gold), 0 0 10px rgba(255,209,0,.5)}
+.diffs input:focus-visible + span{outline:2px solid var(--ink-head); outline-offset:3px}
+.obj-row{display:grid; grid-template-columns:1fr 78px 32px; gap:6px; margin-bottom:6px}
+.obj-row .rm{border:1px solid #8a6a3a; background:rgba(255,255,255,.35); border-radius:3px; cursor:pointer; color:#7a1a0f}
+.linkbtn{background:none; border:0; color:#6b2a0a; cursor:pointer; padding:2px 0; text-decoration:underline; text-underline-offset:3px}
+.checks{display:flex; flex-wrap:wrap; gap:8px 18px}
+.checks label{display:flex; gap:8px; align-items:center; cursor:pointer}
+.hint{font-size:.88rem; color:var(--ink-soft); margin-top:4px; line-height:1.4}
+.actions{display:flex; gap:10px; justify-content:flex-end; margin-top:18px; flex-wrap:wrap; align-items:center}
+.actions .grow{flex:1}
+.ai-box{display:flex; gap:10px; align-items:center; flex-wrap:wrap; padding:10px 12px; margin:-4px 0 14px; border-radius:4px; background:rgba(70,40,140,.1); border:1px solid rgba(90,60,170,.35)}
+.ai-box .st{flex:1; min-width:180px; font-size:.95rem; color:#3a2a6a; font-style:italic}
+.pick{list-style:none; padding:0; margin:0}
+.pick li{display:flex; gap:10px; align-items:flex-start; padding:7px 0; border-bottom:1px dashed rgba(110,70,25,.3)}
+.pick li:last-child{border-bottom:0}
+.pick input{margin-top:5px}
+.pick .pt{font-weight:700}
+.pick .pt[class*=" d"]{background:#1f150c; padding:1px 8px; border-radius:3px; display:inline-block}
+.pick .pd{font-size:.92rem; color:var(--ink-soft)}
+.pick select{width:auto !important; padding:3px 6px !important; font-size:.9rem !important; margin-left:auto}
+.thinking::after{content:""; display:inline-block; width:1.2em; text-align:left; animation:dots 1.2s steps(4) infinite}
+@keyframes dots{0%{content:""}25%{content:"."}50%{content:".."}75%{content:"..."}}
+
+/* ---------- FX ---------- */
+.announce{position:fixed; left:0; right:0; top:calc(13% + env(safe-area-inset-top,0px)); text-align:center; pointer-events:none; z-index:60}
+.announce > div{font-family:var(--caps); font-weight:900; color:var(--gold); padding:0 16px; animation:fade 3s ease forwards;
+  -webkit-text-stroke:1px #3b2400; text-shadow:0 3px 0 #000, 0 0 24px rgba(0,0,0,.9)}
+.announce .a1{font-size:clamp(1.6rem,4.4vw,2.5rem)}
+.announce .a2{font-size:1.2rem; color:#e0c4ff; font-family:var(--serif); font-weight:800; -webkit-text-stroke:0; text-shadow:1px 1px 0 #000,0 0 10px #000}
+.announce .lvl{font-size:clamp(2.4rem,8vw,4.4rem); color:#fff3b0; text-shadow:0 3px 0 #000, 0 0 40px rgba(255,209,0,.95)}
+.rays{position:fixed; left:50%; top:calc(13% + 40px); width:760px; height:760px; margin:-380px 0 0 -380px; pointer-events:none; z-index:59;
+  background:repeating-conic-gradient(from 0deg, rgba(255,215,90,.32) 0 6deg, transparent 6deg 18deg);
+  -webkit-mask:radial-gradient(circle, #000 0, rgba(0,0,0,.6) 25%, transparent 62%); mask:radial-gradient(circle, #000 0, rgba(0,0,0,.6) 25%, transparent 62%);
+  animation:rays 3.8s ease forwards}
+@keyframes rays{0%{opacity:0; transform:rotate(0) scale(.4)} 15%{opacity:1; transform:rotate(20deg) scale(1)} 80%{opacity:.8} 100%{opacity:0; transform:rotate(70deg) scale(1.1)}}
+@keyframes fade{0%{opacity:0; transform:scale(.9)} 10%{opacity:1; transform:scale(1.04)} 16%{transform:scale(1)} 72%{opacity:1} 100%{opacity:0; transform:translateY(-16px)}}
+.floater{position:fixed; z-index:61; pointer-events:none; font-family:var(--serif); font-weight:800; font-size:1.25rem; color:#e0b8ff; text-shadow:1px 1px 0 #000, 0 0 8px #000; animation:floatup 1.8s ease-out forwards; white-space:nowrap}
+.floater.gold{color:var(--gold)}
+@keyframes floatup{from{opacity:0; transform:translate(-50%,0)} 15%{opacity:1} to{opacity:0; transform:translate(-50%,-70px)}}
+.sparks{position:fixed; z-index:61; pointer-events:none}
+.sparks i{position:absolute; width:6px; height:6px; border-radius:50%; background:radial-gradient(circle,#fff6c0,#ffc400 50%,transparent 70%); animation:spark .9s ease-out forwards}
+@keyframes spark{to{transform:translate(var(--dx),var(--dy)) scale(.2); opacity:0}}
+.toast{position:fixed; left:50%; bottom:calc(26px + env(safe-area-inset-bottom,0px)); z-index:62; width:min(420px,92vw);
+  display:flex; align-items:center; gap:14px; padding:12px 18px 12px 12px; border-radius:6px;
+  background:linear-gradient(180deg,#2e2016,#130c06); box-shadow:0 0 0 1px #000, 0 0 0 3px #e8c766, 0 0 0 4px #3a2a0a, 0 10px 30px rgba(0,0,0,.7), 0 0 40px rgba(255,200,60,.25);
+  animation:toastin 4.6s var(--ease-out) forwards; pointer-events:none}
+.toast small{display:block; color:#cbbd9f; font-size:.85rem}
+.toast b{display:block; font-family:var(--caps); font-weight:900; color:var(--gold); font-size:1.2rem; text-shadow:1px 1px 0 #000}
+.toast .pts{margin-left:auto; font-family:var(--caps); font-weight:900; color:var(--gold-hi); font-size:1.3rem}
+@keyframes toastin{0%{opacity:0; transform:translate(-50%,40px)} 8%{opacity:1; transform:translate(-50%,0)} 88%{opacity:1; transform:translate(-50%,0)} 100%{opacity:0; transform:translate(-50%,20px)}}
+.status{font-size:.85rem; color:#8f826f; padding:0 16px 10px}
+
+
+.qrbox{display:inline-block; padding:10px; background:#fff; border-radius:4px; margin:6px 0 10px; box-shadow:0 0 0 1px #8a6a3a}
+.qrbox img,.qrbox canvas{display:block}
+/* ---------- paths ---------- */
+.pbadge{display:inline-grid; place-items:center; flex:none; width:18px; height:18px; border-radius:50%; font-family:var(--caps); font-weight:800; font-size:.72rem; line-height:1; color:#fff; text-shadow:0 1px 0 rgba(0,0,0,.6); box-shadow:0 0 0 1px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.35); align-self:center}
+.q .pbadge{margin-right:-2px}
+.pchip{display:inline-flex !important; align-items:center; gap:6px}
+.diffs span.pbadge{display:inline-grid; place-items:center; padding:0; border-radius:50%; text-shadow:0 1px 0 rgba(0,0,0,.6); box-shadow:0 0 0 1px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.35)}
+.paths-pick span{color:#f3e3bd}
+.pathrows{display:grid; gap:4px; margin-top:10px; max-width:860px}
+.prow{display:grid; grid-template-columns:34px minmax(140px,1.1fr) 2fr 64px; gap:12px; align-items:center; padding:8px 10px; border-radius:4px; border:1px solid transparent}
+.prow:hover{background:rgba(255,248,225,.35); border-color:rgba(110,70,25,.25)}
+.prow .pbadge{width:30px; height:30px; font-size:1rem}
+.prow .nm b{display:block; font-family:var(--caps); font-size:1.1rem; color:var(--ink-head); line-height:1.15}
+.prow .nm span{font-size:.86rem; color:var(--ink-soft)}
+.prow .val{font-family:var(--caps); font-weight:800; font-size:1.35rem; color:var(--ink-head); text-align:right; font-variant-numeric:tabular-nums}
+.ptrack{position:relative; height:14px; border-radius:7px; background:rgba(90,55,20,.14); box-shadow:inset 0 1px 2px rgba(0,0,0,.2)}
+.ptrack i{position:absolute; left:0; top:0; bottom:0; border-radius:7px; transition:width .6s var(--ease-out); min-width:0}
+.ptrack .goalmark{position:absolute; top:-4px; bottom:-4px; width:2px; background:var(--ink-head); border-radius:1px}
+.psub{grid-column:2 / -1; font-size:.86rem; color:var(--ink-soft); margin-top:-4px}
+.psub .warn{color:#9b1a0e; font-weight:700}
+.seg{display:inline-flex; border-radius:4px; overflow:hidden; box-shadow:0 0 0 1px #8a6a3a; margin:6px 0 4px}
+.seg button{background:rgba(255,250,235,.55); border:0; border-right:1px solid #8a6a3a; padding:6px 14px; cursor:pointer; color:var(--ink); font-family:var(--caps); font-weight:700}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:linear-gradient(180deg,#8d1a10,#57100a); color:var(--gold); text-shadow:1px 1px 0 #000}
+.wkgrid{display:grid; gap:3px; margin-top:8px; overflow-x:auto; max-width:860px}
+.wkgrid .hd{font-size:.78rem; color:var(--ink-soft); text-align:center; white-space:nowrap}
+.wkgrid .lb{display:flex; align-items:center; gap:6px; font-size:.95rem; white-space:nowrap; padding-right:6px}
+.wkgrid .lb .pbadge{width:16px; height:16px; font-size:.65rem}
+.wkgrid .c{height:26px; border-radius:3px; display:grid; place-items:center; font-size:.82rem; font-variant-numeric:tabular-nums; color:var(--ink-head); background:rgba(90,55,20,.1); cursor:default}
+.wkgrid .c.cur{box-shadow:inset 0 0 0 1.5px var(--ink-head)}
+.pedit{display:grid; grid-template-columns:34px 1fr 1.6fr 90px auto; gap:8px; align-items:center; margin-bottom:6px; max-width:860px}
+.pedit input{padding:6px 8px !important}
+.pedit.hdr{margin-bottom:2px; font-size:.82rem; color:var(--ink-soft)}
+.swatches{display:flex; gap:4px; flex-wrap:wrap}
+.swatch{width:22px; height:22px; border-radius:50%; border:0; cursor:pointer; box-shadow:0 0 0 1px rgba(0,0,0,.5)}
+.swatch[aria-pressed="true"]{box-shadow:0 0 0 2px var(--parch), 0 0 0 4px var(--ink-head)}
+.pedit .pbadge{width:28px; height:28px; font-size:.95rem; cursor:pointer; border:0}
+@media (max-width:760px){
+  .prow{grid-template-columns:30px 1fr 52px; gap:8px}
+  .prow .ptrack{grid-column:2 / 4; grid-row:2}
+  .psub{grid-column:2 / -1}
+  .pedit{grid-template-columns:30px 1fr 60px 30px}
+  .pedit .pd-desc{grid-column:2 / -1; grid-row:2}
+  .pedit.hdr .h-desc{display:none}
+}
+/* ---------- purchases ---------- */
+.mini-lbl{display:block; font-family:var(--caps); font-weight:800; font-size:.92rem; color:var(--ink-head); margin-bottom:4px}
+.page select{background:rgba(255,250,235,.72); border:1px solid #8a6a3a; border-radius:3px; padding:8px 10px; color:var(--ink); font-size:1rem; width:100%}
+.buy-form{display:grid; grid-template-columns:2fr 90px 110px 1.2fr auto; gap:8px; align-items:end; max-width:820px}
+.buy-form.big{grid-template-columns:2fr 140px 150px auto}
+.chips{display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin:12px 0 0}
+.chips .mini-lbl{margin:0 4px 0 0}
+.chip-btn{background:rgba(255,248,225,.5); border:1px solid rgba(110,70,25,.45); border-radius:14px; padding:3px 11px; cursor:pointer; color:var(--ink); font-size:.95rem}
+.chip-btn:hover{background:rgba(255,230,160,.7)}
+.cat-h{display:flex; justify-content:space-between; max-width:820px; margin:14px 0 2px; padding-bottom:3px; border-bottom:1px solid rgba(110,70,25,.35); font-family:var(--caps); font-weight:800; color:var(--ink-head)}
+.cat-sum{font-family:var(--serif); font-weight:500; color:var(--ink-soft); font-size:.95rem}
+.buy-row{display:flex; align-items:center; gap:10px; max-width:820px; padding:5px 2px; border-bottom:1px dashed rgba(110,70,25,.18)}
+.buy-row .box{width:24px; height:24px; flex:none; border:2px solid #6b4a24; border-radius:3px; background:rgba(255,255,255,.35); cursor:pointer; padding:0}
+.buy-row .box:hover{background:rgba(47,109,18,.18)}
+.buy-row .bn{flex:1; min-width:0; font-size:1.05rem}
+.buy-row .bq{color:var(--ink-soft); font-size:.92rem}
+.buy-row .bp{color:var(--ink-soft); white-space:nowrap; font-variant-numeric:tabular-nums}
+.buy-row.done .bn{color:#6f5a3e}
+.buy-row .ok-mark{width:24px; text-align:center; color:#2f6d12; font-weight:800}
+.buy-row input.paid{width:110px !important; padding:4px 8px !important}
+.ibtn{background:none; border:0; cursor:pointer; font-size:1.15rem; color:#8a6a3a; width:30px; height:30px; border-radius:3px}
+.ibtn:hover{background:rgba(110,70,25,.12)} .ibtn.on{color:#b8860b} .ibtn.x{color:#7a1a0f}
+.bigcards{display:grid; grid-template-columns:repeat(auto-fill,minmax(min(340px,100%),1fr)); gap:14px; margin-top:16px}
+.bigcard{display:flex; flex-direction:column; gap:8px; padding:14px 16px; border-radius:5px; color:#eadfc6;
+  background:linear-gradient(180deg,#2e2016,#1a110a); box-shadow:0 0 0 1px #000, 0 0 0 2px #8a6a1e, 0 4px 10px rgba(0,0,0,.35)}
+.bc-top{display:flex; align-items:flex-start; gap:8px; justify-content:space-between}
+.bigcard h4{margin:0; font-family:var(--caps); font-weight:800; color:var(--gold); font-size:1.15rem; text-shadow:1px 1px 0 #000; line-height:1.2}
+.badge{flex:none; font-size:.8rem; padding:2px 8px; border-radius:10px; background:#3b2a1b; color:#d9c89f; border:1px solid #6b4f14; white-space:nowrap}
+.badge.cool{background:#1c2a44; color:#a9c6ff; border-color:#3a5a9a}
+.badge.ready{background:#1f3a14; color:#a6e38a; border-color:#3f7a22}
+.gbar{position:relative; height:18px; border-radius:3px; background:#120a05; box-shadow:0 0 0 1px #000, 0 0 0 2px #6b4f14, inset 0 2px 4px rgba(0,0,0,.8); overflow:hidden}
+.gbar i{position:absolute; inset:0 auto 0 0; background:linear-gradient(180deg,#fff0a0,#e0a800 55%,#8a6000); transition:width .7s var(--ease-out)}
+.gbar span{position:absolute; inset:0; display:grid; place-items:center; font-size:.8rem; color:#fff; text-shadow:1px 1px 0 #000,0 0 3px #000}
+.bc-sum{font-size:.95rem; color:#d9c89f}
+.bc-save{display:grid; grid-template-columns:1fr auto auto; gap:6px}
+.bigcard input, .bigcard textarea{width:100%; background:rgba(0,0,0,.35); border:1px solid #6b4f14; border-radius:3px; padding:6px 9px; color:#f3e3bd; font-size:.98rem}
+.bigcard .mini-lbl{color:var(--gold-dim)}
+.bc-notes{min-height:54px; resize:vertical; line-height:1.4}
+.bc-act{display:flex; flex-wrap:wrap; gap:6px}
+.bc-date{font-size:.82rem; color:#9c8b6c}
+.bc-edit{display:grid; grid-template-columns:1fr 120px auto; gap:6px; align-items:end}
+@media (max-width:760px){
+  .buy-form, .buy-form.big{grid-template-columns:1fr 1fr}
+  .buy-form > .field:first-child{grid-column:1 / -1}
+  .bc-edit{grid-template-columns:1fr 1fr}
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important}
+  .announce > div{animation:fadeplain 2.6s linear forwards !important}
+  .toast{animation:toastplain 4.6s linear forwards !important}
+  @keyframes fadeplain{0%,85%{opacity:1} 100%{opacity:0}}
+  @keyframes toastplain{0%,90%{opacity:1; transform:translate(-50%,0)} 100%{opacity:0; transform:translate(-50%,0)}}
+  .rays,.sparks{display:none}
+}
+@media (max-width:1280px){ .tracker{display:none} }
+@media (max-width:760px){
+  .layout{padding:40px 10px 30px}
+  .head{padding-left:88px; flex-wrap:wrap}
+  .sigil{width:72px; height:72px; top:-24px} .sigil span{font-size:50px}
+  .banner{font-size:1.15rem; padding:5px 24px 6px}
+  .head .count{width:100%; order:5}
+  .body{grid-template-columns:1fr}
+  .list{max-height:none; min-height:360px; border-right:0}
+  .detail{display:none; max-height:none; min-height:440px; padding:20px 18px 26px}
+  .frame.show-detail .list{display:none}
+  .frame.show-detail .detail{display:block}
+  .back{display:inline-block}
+  .row,.row3{grid-template-columns:1fr}
+  .tabs{padding:0 8px; gap:3px}
+  .tab{padding:8px 10px 9px; font-size:.9rem}
+  .page{padding:22px 18px 28px; max-height:none}
+  .shop-form{grid-template-columns:1fr 1fr}
+  .zbar{grid-template-columns:90px 1fr 34px}
+  .rays{width:520px; height:520px; margin:-260px 0 0 -260px}
+}
+</style>
+</head>
+<body>
+<canvas id="embers" aria-hidden="true"></canvas>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="gg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff0a8"/><stop offset=".45" stop-color="#d9a932"/><stop offset="1" stop-color="#6b4a0e"/></linearGradient>
+    <symbol id="orn" viewBox="0 0 46 46">
+      <path d="M3 43V16C3 8 8 3 16 3h27" fill="none" stroke="#0b0703" stroke-width="6"/>
+      <path d="M3 43V16C3 8 8 3 16 3h27" fill="none" stroke="url(#gg)" stroke-width="3.5"/>
+      <path d="M10 43V20c0-6 4-10 10-10h23" fill="none" stroke="url(#gg)" stroke-width="1.3" opacity=".8"/>
+      <path d="M11 11c5-6 13-4 12 3-1 4-6 4-6 1" fill="none" stroke="url(#gg)" stroke-width="2"/>
+      <rect x="4" y="4" width="10" height="10" transform="rotate(45 9 9)" fill="url(#gg)" stroke="#0b0703" stroke-width="1.2"/>
+      <circle cx="9" cy="9" r="2" fill="#a11f12"/>
+    </symbol>
+    <symbol id="shield" viewBox="0 0 40 46">
+      <path d="M20 2 37 8v13c0 12-8 19-17 23C11 40 3 33 3 21V8z" fill="url(#gg)" stroke="#0b0703" stroke-width="2"/>
+      <path d="M20 7 32 11v10c0 9-6 14-12 17-6-3-12-8-12-17V11z" fill="#5a1a0e"/>
+      <path d="M20 13l2.6 5.4 5.9.8-4.3 4.1 1 5.8L20 26.4l-5.2 2.7 1-5.8-4.3-4.1 5.9-.8z" fill="#ffd100"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="layout">
+  <div class="col">
+    <main class="frame" id="frame">
+      <svg class="corner tl"><use href="#orn"/></svg><svg class="corner tr"><use href="#orn"/></svg>
+      <svg class="corner bl"><use href="#orn"/></svg><svg class="corner br"><use href="#orn"/></svg>
+      <header class="head">
+        <div class="sigil" aria-hidden="true"><span>!</span></div>
+        <div class="banner-wrap"><h1 class="banner" style="margin:0">Журнал заданий</h1></div>
+        <div class="count" id="count"></div>
+        <div class="spacer"></div>
+        <button class="syncbtn busy" id="syncBtn" type="button">☁ Подключаюсь…</button>
+        <button class="hbtn" id="riddleBtn" title="Записать незнакомый вопрос из практики">? Вопрос</button>
+        <button class="hbtn" id="briefBtn" title="Утренний сбор">☀ Сбор</button>
+        <button class="roundx" id="soundBtn" title="Звук" aria-label="Звук"></button>
+      </header>
+
+      <div class="body" id="body">
+        <nav class="list" id="list" aria-label="Список заданий"></nav>
+        <section class="detail parchment" id="detail" aria-live="polite"></section>
+        <section class="page parchment" id="page" hidden></section>
+      </div>
+
+      <div class="foot" id="foot">
+        <button class="btn" id="newBtn">Новое задание</button>
+        <span class="money" id="purse" title="Кошелёк"></span>
+        <div class="spacer"></div>
+        <button class="btn ghost" id="abandonBtn">Отказаться</button>
+        <button class="btn" id="completeBtn">Выполнить</button>
+      </div>
+      <div class="xp">
+        <div class="xp-bar" id="xpBar"><div class="xp-rest" id="xpRest"></div><div class="xp-fill" id="xpFill"></div><div class="xp-label" id="xpLabel"></div></div>
+      </div>
+      <div class="status" id="status"></div>
+    </main>
+    <div class="tabs" id="tabs" role="tablist"></div>
+  </div>
+  <aside class="tracker" id="tracker" aria-label="Отслеживаемые задания"></aside>
+</div>
+
+<input type="file" id="importFile" accept=".json,application/json" hidden>
+<div class="announce" id="announce" aria-live="assertive"></div>
+<div id="fx"></div>
+
+<!-- Quest editor -->
+<dialog id="dlg">
+  <form class="sheet parchment" id="form" method="dialog">
+    <h2 id="formTitle">Новое задание</h2>
+    <p class="sub" id="formSub" hidden></p>
+    <div class="field">
+      <label for="fTitle">Название</label>
+      <input type="text" id="fTitle" maxlength="120" placeholder="Например: Разобрать почту отделения" autocomplete="off">
+    </div>
+    <div class="field">
+      <label for="fDesc">Описание</label>
+      <textarea id="fDesc" maxlength="4000" placeholder="Что нужно сделать и зачем. Можно коротко — Квестодатель оформит."></textarea>
+    </div>
+    <div class="ai-box" id="aiBox" hidden>
+      <button type="button" class="btn ai small" id="aiBtn">✦ Спросить Квестодателя</button>
+      <span class="st" id="aiSt">Напишите суть задачи — Квестодатель оформит описание и разобьёт на шаги.</span>
+    </div>
+    <div class="row3">
+      <div class="field">
+        <label for="fPeriod">Период</label>
+        <select id="fPeriod"><option value="day">День</option><option value="week">Неделя</option><option value="month">Месяц</option></select>
+      </div>
+      <div class="field">
+        <label for="fWhen">Когда</label>
+        <select id="fWhen"></select>
+      </div>
+      <div class="field">
+        <label for="fZone">Зона</label>
+        <input type="text" id="fZone" list="zones" maxlength="40" placeholder="Клиника" autocomplete="off">
+        <datalist id="zones"></datalist>
+      </div>
+    </div>
+    <div class="field">
+      <span class="lbl" id="pathLbl">Путь <span style="font-family:var(--serif);font-weight:400;color:var(--ink-soft)">— до двух</span></span>
+      <div class="diffs paths-pick" id="fPath" role="radiogroup" aria-labelledby="pathLbl"></div>
+      <div class="hint" id="pathHint">Направление развития, в которое идёт задание. Пути настраиваются во вкладке «Пути».</div>
+    </div>
+    <div class="field">
+      <span class="lbl" id="diffLbl">Сложность</span>
+      <div class="diffs" id="fDiff" role="radiogroup" aria-labelledby="diffLbl"></div>
+      <div class="hint">Цвет названия в списке. От сложности зависит награда.</div>
+    </div>
+    <div class="field">
+      <span class="lbl">Задачи</span>
+      <div id="fObjs"></div>
+      <button type="button" class="linkbtn" id="addObj">Добавить задачу</button>
+      <div class="hint">Число справа — сколько раз нужно выполнить, например 30 подтягиваний.</div>
+    </div>
+    <div class="row">
+      <div class="field">
+        <label for="fDue">Крайний срок</label>
+        <input type="date" id="fDue">
+      </div>
+      <div class="field">
+        <span class="lbl">Параметры</span>
+        <div class="checks">
+          <label><input type="checkbox" id="fFocus"> ★ Главное</label>
+          <label><input type="checkbox" id="fTrack" checked> Отслеживать</label>
+          <label><input type="checkbox" id="fRepeat"> <span id="repeatTxt">Повторять каждый день</span></label>
+        </div>
+      </div>
+    </div>
+    <div class="actions">
+      <button type="button" class="btn ghost" id="cancelBtn">Отмена</button>
+      <button type="submit" class="btn" id="saveBtn">Принять задание</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Confirm -->
+<dialog id="confirmDlg">
+  <div class="sheet parchment">
+    <h2 id="cTitle"></h2>
+    <p id="cText" style="margin:6px 0 4px;line-height:1.5"></p>
+    <div class="actions">
+      <button type="button" class="btn ghost" id="cNo">Отмена</button>
+      <button type="button" class="btn" id="cYes"></button>
+    </div>
+  </div>
+</dialog>
+
+<!-- Quick riddle capture -->
+<dialog id="riddleDlg">
+  <form class="sheet parchment" id="riddleForm" method="dialog">
+    <h2>Новый вопрос</h2>
+    <p class="sub">Запишите незнакомое, пока не забылось. Задание появится в недельных, чтобы разобраться в течение недели.</p>
+    <div class="field">
+      <label for="rTitle">Что встретилось</label>
+      <input type="text" id="rTitle" maxlength="120" placeholder="Например: синдром Бертолотти" autocomplete="off">
+    </div>
+    <div class="field">
+      <label for="rNote">Где и в какой связи</label>
+      <textarea id="rNote" maxlength="2000" placeholder="Пациент, ситуация, что именно непонятно — необязательно"></textarea>
+    </div>
+    <div class="checks" style="margin-bottom:6px">
+      <label><input type="checkbox" id="rCraft" checked> Засчитать также в «Целительство»</label>
+      <label><input type="checkbox" id="rToday"> Разобрать сегодня</label>
+    </div>
+    <div class="actions">
+      <button type="button" class="btn ghost" id="rCancel">Отмена</button>
+      <button type="submit" class="btn">Записать</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- GitHub sync -->
+<dialog id="ghDlg">
+  <div class="sheet parchment" id="ghBody"></div>
+</dialog>
+
+<!-- Morning briefing -->
+<dialog id="briefDlg">
+  <div class="sheet parchment" id="briefBody"></div>
+</dialog>
+
+<!-- AI breakdown -->
+<dialog id="breakDlg">
+  <div class="sheet parchment" id="breakBody"></div>
+</dialog>
+<script>
+(() => {
+"use strict";
+const LS_KEY = "questlog.v1";
+const PERIODS = {
+  day:   { tab:"День",   list:"Ежедневные",   xp:50,  every:"каждый день",   back:"завтра",          when:["Сегодня","Завтра"],            past:"с прошлого дня" },
+  week:  { tab:"Неделя", list:"Еженедельные", xp:200, every:"каждую неделю", back:"в понедельник",   when:["Эта неделя","Следующая неделя"], past:"с прошлой недели" },
+  month: { tab:"Месяц",  list:"Месячные",     xp:800, every:"каждый месяц",  back:"в начале месяца", when:["Этот месяц","Следующий месяц"], past:"с прошлого месяца" }
+};
+const PORDER = ["day","week","month"];
+const DIFFS = [
+  { name:"Пустяк", mult:.25 }, { name:"Лёгкое", mult:.75 }, { name:"Обычное", mult:1 },
+  { name:"Сложное", mult:1.5 }, { name:"Эпическое", mult:2.5 }
+];
+const DEFAULT_ZONES = ["Клиника","Тренировки","Экзамен","Личное","Дом"];
+const WARE_ICONS = ["☕","📖","🎬","🍰","🎮","🛍","🧖","🎧","🍷","✈"];
+
+const blank = () => ({ v:2, xp:0, money:0, rested:0, quests:[], rewards:[], small:[], big:[], staples:[], paths:[], log:{}, ach:{},
+  stats:{ done:0, byZone:{}, byPath:{}, carried:0, abandoned:0, briefs:0, bought:0, epic:0, chains:0, early:0, planned:0 }, lastBrief:"", updated:0 });
+let state = blank();
+let ui = { tab:"day", sel:null, collapsed:{}, sound:true, editing:null, parent:null, anim:false };
+
+/* ---------- utils ---------- */
+const $ = id => document.getElementById(id);
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+function periodStart(p, d = new Date()){
+  const x = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  if (p === "week"){ x.setDate(x.getDate() - (x.getDay() + 6) % 7); }
+  if (p === "month"){ x.setDate(1); }
+  return x.getTime();
+}
+function shiftPeriod(p, ts, n){
+  const d = new Date(ts);
+  if (p === "day") d.setDate(d.getDate() + n);
+  if (p === "week") d.setDate(d.getDate() + 7*n);
+  if (p === "month") d.setMonth(d.getMonth() + n);
+  return periodStart(p, d);
+}
+function dayKey(d = new Date()){ return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0"); }
+const todayISO = () => dayKey();
+function fmtDate(iso){ const [y,m,d] = iso.split("-").map(Number); return new Date(y, m-1, d).toLocaleDateString("ru-RU", { day:"numeric", month:"long" }); }
+function fmtPkey(p, ts){
+  const d = new Date(ts);
+  if (p === "day") return d.toLocaleDateString("ru-RU", { weekday:"short", day:"numeric", month:"short" });
+  if (p === "week") return "с " + d.toLocaleDateString("ru-RU", { day:"numeric", month:"short" });
+  return d.toLocaleDateString("ru-RU", { month:"long" });
+}
+function questXp(q){ return Math.max(5, Math.round(PERIODS[q.period].xp * DIFFS[q.diff].mult / 5) * 5); }
+const questMoney = q => questXp(q) * 20; // copper
+function levelInfo(xp){ let lvl = 1, need = 400, rest = xp; while (rest >= need){ rest -= need; lvl++; need = 300 + lvl * 100; } return { lvl, rest, need }; }
+const objsDone = q => q.objectives.length > 0 && q.objectives.every(o => o.have >= o.need);
+function plural(n, a, b, c){ const m10 = n % 10, m100 = n % 100; return m10 === 1 && m100 !== 11 ? a : (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14) ? b : c); }
+const isFuture = q => !q.repeat && q.status === "active" && q.pkey > periodStart(q.period);
+const isPast = q => !q.repeat && q.status === "active" && q.pkey < periodStart(q.period);
+const children = q => state.quests.filter(x => x.parentId === q.id);
+const byId = id => state.quests.find(q => q.id === id) || null;
+function moneyNode(c){
+  const w = el("span","money"); c = Math.max(0, Math.round(c));
+  const g = Math.floor(c / 10000), s = Math.floor(c / 100) % 100, cu = c % 100;
+  const add = (v, cls) => { const s2 = el("span","coin " + cls); s2.append(String(v), el("i")); w.append(s2); };
+  if (g) add(g, "g"); if (g || s) add(s, "s"); add(cu, "c");
+  return w;
+}
+
+/* ---------- storage & sync ---------- */
+// Three-way merge: local state, cloud state and "base" (the last state both agreed on).
+// Items changed on only one side win; counters add up the deltas from both sides.
+let baseKey = LS_KEY + ".base";
+const COLS = ["quests","small","big","rewards","paths"];
+let dbRef = null, saving = false, pending = false, saveTimer = null, base = null, snapMap = new Map();
+let syncState = { mode:"local", at:0, msg:"", provider:"", fails:0 };
+const setStatus = t => { $("status").textContent = t; };
+function stable(v){
+  if (Array.isArray(v)) return "[" + v.map(stable).join(",") + "]";
+  if (v && typeof v === "object") return "{" + Object.keys(v).sort().filter(k => k !== "u" && v[k] !== undefined).map(k => JSON.stringify(k) + ":" + stable(v[k])).join(",") + "}";
+  return JSON.stringify(v === undefined ? null : v);
+}
+const clone = x => JSON.parse(JSON.stringify(x));
+const sig = st => stable({ ...st, updated:0, lastBackup:0 });
+function saveLocal(){ try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch(e){} }
+function loadLocal(){ try { const s = localStorage.getItem(LS_KEY); return s ? JSON.parse(s) : null; } catch(e){ return null; } }
+function saveBase(){ try { localStorage.setItem(baseKey, JSON.stringify(base)); } catch(e){} }
+function loadBase(){ try { const s = localStorage.getItem(baseKey); return s ? normalize(JSON.parse(s)) : null; } catch(e){ return null; } }
+const itemKey = (c, x) => c + ":" + (x.id || x.name);
+function rebuildSnap(){ snapMap = new Map(); for (const c of COLS) for (const x of state[c]) snapMap.set(itemKey(c, x), stable(x)); }
+function stamp(){
+  const now = Date.now();
+  for (const c of COLS) for (const x of state[c]){ const k = itemKey(c, x), j = stable(x); if (snapMap.get(k) !== j){ x.u = now; snapMap.set(k, j); } }
+}
+function commit(){ stamp(); state.updated = Date.now(); saveLocal(); clearTimeout(saveTimer); if (dbRef){ setSync("pending"); saveTimer = setTimeout(flush, 600); } }
+
+function mergeList(L, R, B, key){
+  const m = a => new Map((a || []).map(x => [key(x), x]));
+  const lm = m(L), rm = m(R), bm = B ? m(B) : null;
+  const pick = k => {
+    const l = lm.get(k), r = rm.get(k), b = bm && bm.get(k);
+    if (l && r){
+      const lj = stable(l), rj = stable(r); if (lj === rj) return (r.u || 0) > (l.u || 0) ? r : l;
+      if (b){ const bj = stable(b); if (bj === lj) return r; if (bj === rj) return l; }
+      return (r.u || 0) > (l.u || 0) ? r : l;
+    }
+    const one = l || r; if (!one) return null;
+    if (!bm || !b) return one;                  // no shared history, or created on one side
+    return stable(b) === stable(one) ? null : one; // unchanged on one side, deleted on the other → deleted
+  };
+  const out = [], seen = new Set();
+  for (const arr of [L || [], R || []]) for (const x of arr){ const k = key(x); if (seen.has(k)) continue; seen.add(k); const v = pick(k); if (v) out.push(v); }
+  return out;
+}
+function mergeNum(l, r, b, hasBase){ l = +l || 0; r = +r || 0; if (!hasBase) return Math.max(l, r); return Math.max(0, Math.round((r + l - (+b || 0)) * 100) / 100); }
+function mergeTree(l, r, b, hasBase){
+  l = l || {}; r = r || {}; b = b || {};
+  const out = {};
+  for (const k of new Set([...Object.keys(l), ...Object.keys(r)])){
+    const lv = l[k], rv = r[k], bv = b[k];
+    const isObj = v => v && typeof v === "object";
+    if (isObj(lv) || isObj(rv)) out[k] = mergeTree(isObj(lv) ? lv : {}, isObj(rv) ? rv : {}, isObj(bv) ? bv : {}, hasBase);
+    else if (typeof lv === "number" || typeof rv === "number") out[k] = mergeNum(lv, rv, bv, hasBase);
+    else out[k] = lv !== undefined ? lv : rv;
+  }
+  return out;
+}
+function mergeStates(L, R, B){
+  const hb = !!B, out = normalize({});
+  for (const c of ["quests","small","big","rewards","paths"]) out[c] = mergeList(L[c], R[c], B && B[c], x => x.id);
+  out.staples = mergeList(L.staples, R.staples, B && B.staples, x => x.name.toLowerCase());
+  for (const n of ["xp","money","rested"]) out[n] = mergeNum(L[n], R[n], B && B[n], hb);
+  out.stats = mergeTree(L.stats, R.stats, B && B.stats, hb);
+  out.log = mergeTree(L.log, R.log, B && B.log, hb);
+  out.ach = { ...R.ach }; for (const [k, v] of Object.entries(L.ach || {})) out.ach[k] = out.ach[k] ? Math.min(out.ach[k], v) : v;
+  out.lastBrief = [L.lastBrief || "", R.lastBrief || ""].sort().pop();
+  out.lastBackup = Math.max(+L.lastBackup || 0, +R.lastBackup || 0);
+  out.updated = Math.max(+L.updated || 0, +R.updated || 0);
+  if (!out.paths.length) out.paths = defaultPaths();
+  return normalize(out);
+}
+
+function setSync(mode, msg){
+  if (mode === "ok") syncState.at = Date.now();
+  syncState.mode = mode; syncState.msg = msg || "";
+  const b = $("syncBtn"); if (!b) return;
+  const t = syncState.at ? new Date(syncState.at).toLocaleTimeString("ru-RU", { hour:"2-digit", minute:"2-digit" }) : "";
+  const map = {
+    ok:      ["ok",   (syncState.provider === "gh" ? "☁ GitHub" : "☁ Синхронизировано") + (t ? " · " + t : ""), "Все изменения в облаке и видны на других устройствах. Нажмите, чтобы проверить обновления."],
+    pending: ["busy", "☁ Сохраняю…", "Изменения отправляются в облако."],
+    saving:  ["busy", "☁ Сохраняю…", "Изменения отправляются в облако."],
+    pulling: ["busy", "☁ Проверяю…", "Загружаю изменения с других устройств."],
+    error:   ["err",  syncState.provider === "gh" ? "⚠ Нет связи с GitHub" : "⚠ Нет связи с облаком", (msg || "Облако не ответило.") + " Изменения сохранены в этом браузере и уйдут в облако при следующей удачной синхронизации. Нажмите, чтобы повторить."],
+    local:   ["err",  "⚠ Только на этом устройстве", msg || "Синхронизация работает, когда журнал открыт по ссылке на claude.ai под вашим аккаунтом. Сейчас записи хранятся только в этом браузере."]
+  };
+  const [cls, label, title] = map[mode] || map.local;
+  b.className = "syncbtn " + cls; b.textContent = label; b.title = title; b.setAttribute("aria-label", label + ". " + title);
+  setStatus(mode === "error" || mode === "local" ? title : "");
+}
+async function flush(){
+  if (!dbRef) return;
+  if (saving){ pending = true; return; }
+  saving = true; clearTimeout(saveTimer);
+  const startSig = sig(state), startLocal = clone(state);
+  setSync("saving");
+  try {
+    const snap = await dbRef.get();
+    let merged = startLocal, remote = null;
+    if (snap.exists){ remote = normalize(snap.data()); merged = mergeStates(startLocal, remote, base); }
+    merged.updated = Math.max(merged.updated || 0, Date.now());
+    if (!remote || sig(remote) !== sig(merged)) await dbRef.set(clone(merged));
+    base = normalize(clone(merged)); saveBase();
+    // keep anything edited while we were talking to the cloud
+    const localChanged = sig(state) !== startSig;
+    state = localChanged ? mergeStates(state, merged, normalize(startLocal)) : normalize(clone(merged));
+    rebuildSnap(); refreshRepeats(); saveLocal();
+    if (remote && sig(remote) !== sig(normalize(startLocal))) render();
+    if (localChanged) pending = true;
+    setSync("ok");
+  } catch(e){
+    syncState.fails++;
+    if (e && e.code === "unavailable" && syncState.fails <= 2) setTimeout(flush, 2000 * syncState.fails + Math.random() * 1000);
+    else setSync("error", (e && e.ru) || (e && e.code === "revoked" ? "Доступ к облаку отозван." : ""));
+    saving = false; pending = false; return;
+  }
+  syncState.fails = 0;
+  saving = false;
+  if (pending){ pending = false; saveTimer = setTimeout(flush, 300); }
+}
+function onRemote(s){
+  if (!s.exists || s.metadata.hasPendingWrites) return;
+  if (saving){ pending = true; return; }
+  const r = normalize(s.data());
+  if (base && sig(r) === sig(base)) return;
+  const dirty = !base || sig(state) !== sig(base);
+  state = mergeStates(state, r, base); base = r; saveBase();
+  rebuildSnap(); refreshRepeats(); saveLocal(); render();
+  if (dirty) saveTimer = setTimeout(flush, 300); else setSync("ok");
+}
+const PATH_COLORS = ["#2f6fb5","#9a7b12","#0e9ab8","#b83227","#1f8a70","#8e3fb0","#c7811a","#c0427f"];
+const RIDDLE_PATH = { id:"riddle", name:"Жажда знаний", desc:"Незнакомое из практики: термины, вопросы, случаи — разобраться позже", color:"#0e9ab8", goal:0 };
+function defaultPaths(){
+  return [
+    { id:"craft",  name:"Целительство", desc:"Профессия: клиника, пациенты, наука",          color:"#2f6fb5", goal:0 },
+    { id:"trial",  name:"Испытание", desc:"Подготовка к экзамену по медицине боли",         color:"#9a7b12", goal:0 },
+    { ...RIDDLE_PATH },
+    { id:"body",   name:"Сила",     desc:"Физическая форма: тренировки, сон, питание",   color:"#b83227", goal:0 },
+    { id:"mind",   name:"Мудрость", desc:"Кругозор: книги, языки, новые навыки",          color:"#1f8a70", goal:0 },
+    { id:"soft",   name:"Харизма",  desc:"Soft skills: общение, управление, выступления", color:"#8e3fb0", goal:0 },
+    { id:"spirit", name:"Дух",      desc:"Отдых, близкие, хобби",                         color:"#c7811a", goal:0 },
+    { id:"home",   name:"Быт",      desc:"Дом, покупки, документы",                        color:"#c0427f", goal:0 }
+  ].map(p => ({ ...p, u:0 }));
+}
+function normalize(s){
+  s = s || {};
+  const b = blank();
+  const out = { ...b, xp:+s.xp||0, money:+s.money||0, rested:+s.rested||0, lastBrief:String(s.lastBrief||""), updated:+s.updated||0,
+    log: (s.log && typeof s.log === "object") ? s.log : {}, ach: (s.ach && typeof s.ach === "object") ? s.ach : {},
+    stats: { ...b.stats, ...(s.stats||{}) } };
+  out.lastBackup = +s.lastBackup || 0;
+  out.stats.byZone = { ...(s.stats && s.stats.byZone || {}) };
+  out.stats.byPath = { ...(s.stats && s.stats.byPath || {}) };
+  out.small = Array.isArray(s.small) ? s.small.filter(x => x && x.id && x.name).map(x => ({ id:x.id, name:String(x.name), qty:String(x.qty||""), price:Math.max(0, +x.price||0), cat:String(x.cat||"Прочее"), bought:+x.bought||0, paid:Math.max(0, +x.paid||0), created:+x.created||0, u:+x.u||0 })) : [];
+  out.big = Array.isArray(s.big) ? s.big.filter(x => x && x.id && x.name).map(x => ({ id:x.id, name:String(x.name), price:Math.max(0, +x.price||0), saved:Math.max(0, +x.saved||0), notes:String(x.notes||""), cool:Math.max(0, +x.cool||0), created:+x.created||0, status:["active","bought","refused"].includes(x.status) ? x.status : "active", closedAt:+x.closedAt||0, paid:Math.max(0, +x.paid||0), u:+x.u||0 })) : [];
+  out.staples = Array.isArray(s.staples) ? s.staples.filter(x => x && x.name).map(x => ({ name:String(x.name), cat:String(x.cat||"Прочее"), price:Math.max(0, +x.price||0), u:+x.u||0 })).slice(0, 40) : [];
+  out.rewards = Array.isArray(s.rewards) ? s.rewards.filter(r => r && r.id && r.name).map(r => ({ id:r.id, name:String(r.name), price:Math.max(1, +r.price||1), icon:r.icon||"☕", u:+r.u||0 })) : [];
+  out.paths = Array.isArray(s.paths) && s.paths.length
+    ? s.paths.filter(p => p && p.id && p.name).map((p, i) => ({ id:String(p.id), name:String(p.name).slice(0,30), desc:String(p.desc||"").slice(0,120), color:/^#[0-9a-f]{6}$/i.test(p.color||"") ? p.color : PATH_COLORS[i % PATH_COLORS.length], goal:clamp(+p.goal||0, 0, 99), u:+p.u||0 })).slice(0, 12)
+    : defaultPaths();
+  const qs = Array.isArray(s.quests) ? s.quests : [];
+  out.quests = qs.filter(q => q && q.id && q.title).map((q, i) => {
+    const period = PERIODS[q.period] ? q.period : "day";
+    return {
+      id:q.id, title:String(q.title), desc:String(q.desc||""), period,
+      zone:String(q.zone||"Прочее"), path:String(q.path||""), path2:(q.path2 && q.path2 !== q.path) ? String(q.path2) : "", diff:clamp(Number(q.diff)||0, 0, 4),
+      objectives: Array.isArray(q.objectives) ? q.objectives.map(o => ({ t:String(o.t||""), need:Math.max(1, +o.need||1), have:Math.max(0, +o.have||0) })) : [],
+      due:q.due||"", repeat:!!q.repeat, tracked:q.tracked !== false, focus:!!q.focus, created:+q.created||0,
+      status: q.status === "done" ? "done" : "active", doneAt:q.doneAt||null,
+      pkey: +q.pkey || periodStart(period), ord: Number.isFinite(+q.ord) && q.ord !== undefined ? +q.ord : i,
+      carried:+q.carried||0, parentId:q.parentId||null, gain:+q.gain||0, u:+q.u||0
+    };
+  });
+  return out;
+}
+function refreshRepeats(){
+  let changed = false;
+  for (const q of state.quests){
+    if (q.repeat && q.status === "done" && q.doneAt && q.doneAt < periodStart(q.period)){
+      q.status = "active"; q.doneAt = null; q.objectives.forEach(o => o.have = 0); changed = true;
+    }
+  }
+  return changed;
+}
+let booted = false;
+async function connect(){
+  const finish = () => { booted = true; maybeBrief(); };
+  const hash = location.hash.match(/^#connect=(.+)$/);
+  if (hash){ try { history.replaceState(null, "", location.pathname + location.search); } catch(e){} }
+  ghCfg = loadGh();
+  if (ghCfg && ghCfg.gistId){
+    setSync("pulling");
+    try { await startGh(false); } catch(e){ setSync("error", e && e.ru); }
+    return finish();
+  }
+  if (!window.claude || !window.claude.use){
+    setSync("local", standaloneMsg());
+    if (hash){ let token = ""; try { token = atob(decodeURIComponent(hash[1])); } catch(e){} if (token) openGhDialog({ token }); }
+    return finish();
+  }
+  const [db, user] = await Promise.all([window.claude.use("db"), window.claude.use("user")]);
+  window.claude.use("sample").then(s => { sampleFn = s; $("aiBox").hidden = !s; renderDetail(); });
+  window.claude.use("downloads").then(d => { dlFn = d; });
+  const id = user ? await user.id() : null;
+  if (!db || !id){ setSync("local"); return finish(); }
+  try { dbRef = db.doc("data/users/" + id + "/journal"); } catch(e){ dbRef = null; setSync("local"); return finish(); }
+  setSync("pulling");
+  try {
+    const snap = await dbRef.get();
+    if (snap.exists){
+      const remote = normalize(snap.data());
+      state = mergeStates(state, remote, base);
+      base = remote; saveBase();
+    }
+    refreshRepeats(); rebuildSnap(); saveLocal(); render();
+    if (!base || sig(state) !== sig(base)) await flush(); else setSync("ok");
+    dbRef.onSnapshot(onRemote, () => { setSync("error"); });
+  } catch(e){ setSync("error"); }
+  finish();
+}
+function pullNow(){ if (dbRef && !saving){ setSync("pulling"); flush(); } }
+
+/* ---------- GitHub sync (works without Claude) ---------- */
+// Data lives in a secret gist, encrypted in the browser with the user's password (AES-GCM, key from PBKDF2).
+const GH_KEY = LS_KEY + ".gh", GH_FILE = "questlog-journal.json", GH_DESC = "Журнал заданий — зашифрованные данные";
+let ghCfg = null, ghKey = null, ghPoll = 0;
+const b64 = buf => btoa(String.fromCharCode(...new Uint8Array(buf)));
+const unb64 = str => Uint8Array.from(atob(str), c => c.charCodeAt(0));
+function loadGh(){ try { const s = localStorage.getItem(GH_KEY); return s ? JSON.parse(s) : null; } catch(e){ return null; } }
+function saveGh(c){ try { if (c) localStorage.setItem(GH_KEY, JSON.stringify(c)); else localStorage.removeItem(GH_KEY); } catch(e){} }
+async function ghDerive(pass, salt){
+  if (!(window.crypto && crypto.subtle)) throw { code:"crypto", ru:"Этот браузер не умеет шифровать данные. Откройте журнал по адресу https://…github.io." };
+  const baseKey = await crypto.subtle.importKey("raw", new TextEncoder().encode(pass), "PBKDF2", false, ["deriveKey"]);
+  return crypto.subtle.deriveKey({ name:"PBKDF2", salt:unb64(salt), iterations:250000, hash:"SHA-256" }, baseKey, { name:"AES-GCM", length:256 }, false, ["encrypt","decrypt"]);
+}
+async function ghEncrypt(obj, key, salt){
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const ct = await crypto.subtle.encrypt({ name:"AES-GCM", iv }, key, new TextEncoder().encode(JSON.stringify(obj)));
+  return { app:"questlog", enc:1, salt, iv:b64(iv), ct:b64(ct) };
+}
+async function ghDecrypt(box, key){
+  try { const pt = await crypto.subtle.decrypt({ name:"AES-GCM", iv:unb64(box.iv) }, key, unb64(box.ct)); return JSON.parse(new TextDecoder().decode(pt)); }
+  catch(e){ throw { code:"badpass", ru:"Пароль шифрования не подходит к журналу, сохранённому на GitHub." }; }
+}
+async function gh(path, opts = {}, token = ghCfg && ghCfg.token){
+  let r;
+  try {
+    r = await fetch("https://api.github.com" + path, { method:opts.method || "GET", body:opts.body, cache:"no-store",
+      headers:{ "Authorization":"Bearer " + token, "Accept":"application/vnd.github+json", "X-GitHub-Api-Version":"2022-11-28", ...(opts.body ? { "Content-Type":"application/json" } : {}) } });
+  } catch(e){ throw { code:"unavailable", ru:"Нет связи с GitHub." }; }
+  if (r.status === 401) throw { code:"auth", ru:"GitHub не принял ключ доступа: проверьте его или создайте новый." };
+  if (r.status === 403 || r.status === 429) throw { code:"unavailable", ru:"GitHub временно ограничил запросы или у ключа нет права «gist»." };
+  if (r.status === 404) throw { code:"notfound", ru:"Хранилище журнала на GitHub не найдено." };
+  if (!r.ok) throw { code:"unavailable", ru:"GitHub ответил ошибкой " + r.status + "." };
+  return r.status === 204 ? null : r.json();
+}
+async function ghReadBox(gistId){
+  const g = await gh("/gists/" + gistId);
+  const f = g.files && g.files[GH_FILE]; if (!f) throw { code:"notfound", ru:"В хранилище на GitHub нет файла журнала." };
+  let text = f.content;
+  if (f.truncated){ const r = await fetch(f.raw_url, { cache:"no-store" }); text = await r.text(); }
+  return JSON.parse(text);
+}
+function ghProvider(){
+  return {
+    get: async () => { const box = await ghReadBox(ghCfg.gistId); const data = await ghDecrypt(box, ghKey); return { exists:true, data:() => data, metadata:{} }; },
+    set: async (obj) => { const box = await ghEncrypt(obj, ghKey, ghCfg.salt); await gh("/gists/" + ghCfg.gistId, { method:"PATCH", body:JSON.stringify({ files:{ [GH_FILE]:{ content:JSON.stringify(box) } } }) }); },
+    onSnapshot: () => () => {}
+  };
+}
+async function ghFindGist(token){
+  for (let page = 1; page <= 5; page++){
+    const list = await gh("/gists?per_page=100&page=" + page, {}, token);
+    const hit = list.find(g => g.files && g.files[GH_FILE]); if (hit) return hit.id;
+    if (list.length < 100) break;
+  }
+  return null;
+}
+// Connect this device: find or create the journal gist, check the password, then start syncing.
+async function ghConnect(token, pass){
+  token = token.trim();
+  const user = await gh("/user", {}, token);
+  let gistId = await ghFindGist(token), salt, key;
+  if (gistId){
+    const box = await (async () => { ghCfg = { token }; return ghReadBox(gistId); })();
+    salt = box.salt; key = await ghDerive(pass, salt); await ghDecrypt(box, key);
+  } else {
+    salt = b64(crypto.getRandomValues(new Uint8Array(16))); key = await ghDerive(pass, salt);
+    const box = await ghEncrypt(normalize(clone(state)), key, salt);
+    const g = await gh("/gists", { method:"POST", body:JSON.stringify({ description:GH_DESC, public:false, files:{ [GH_FILE]:{ content:JSON.stringify(box) } } }) }, token);
+    gistId = g.id;
+  }
+  ghCfg = { token, pass, gistId, salt, login:user.login };
+  saveGh(ghCfg); ghKey = key;
+  await startGh(true);
+  return user.login;
+}
+async function startGh(fresh){
+  if (!ghKey) ghKey = await ghDerive(ghCfg.pass, ghCfg.salt);
+  syncState.provider = "gh"; baseKey = LS_KEY + ".base.gh." + ghCfg.gistId;
+  base = fresh ? null : loadBase();
+  dbRef = ghProvider();
+  await flush();
+  clearInterval(ghPoll);
+  ghPoll = setInterval(() => { if (!document.hidden) pullNow(); }, 60000);
+}
+function ghDisconnect(){ clearInterval(ghPoll); saveGh(null); ghCfg = null; ghKey = null; dbRef = null; syncState.provider = ""; setSync("local", standaloneMsg()); }
+const standaloneMsg = () => "Записи хранятся только в этом браузере. Нажмите, чтобы подключить синхронизацию через GitHub.";
+
+function openGhDialog(prefill){
+  const b = $("ghBody"); b.textContent = "";
+  b.append(el("h2", null, "Синхронизация через GitHub"));
+  if (ghCfg && dbRef){
+    b.append(el("p", null, `Подключено к аккаунту ${ghCfg.login}. Журнал хранится в секретном gist и зашифрован вашим паролем: без пароля его содержимое прочитать нельзя.`));
+    b.append(el("h3", null, "Подключить другое устройство"));
+    const secure = location.protocol === "https:";
+    const link = location.origin + location.pathname + "#connect=" + encodeURIComponent(btoa(ghCfg.token));
+    if (secure){
+      b.append(el("p","hint","Отсканируйте код камерой телефона — откроется журнал с уже вставленным ключом. Останется ввести пароль шифрования."));
+      const qr = el("div","qrbox"); b.append(qr);
+      loadQr().then(ok => { if (ok){ new window.QRCode(qr, { text:link, width:220, height:220, correctLevel:window.QRCode.CorrectLevel.M }); } else qr.textContent = "Не удалось загрузить генератор кода. Скопируйте ссылку ниже."; });
+      const cp = el("button","btn ghost small","Скопировать ссылку для подключения");
+      cp.onclick = async () => { try { await navigator.clipboard.writeText(link); cp.textContent = "Ссылка скопирована"; } catch(e){ prompt("Ссылка для подключения:", link); } };
+      b.append(cp);
+      b.append(el("p","hint","В ссылке и коде есть ваш ключ доступа к GitHub — не пересылайте их другим людям."));
+    } else b.append(el("p","hint","Откройте журнал на своём сайте github.io на другом устройстве и введите тот же ключ и пароль."));
+    const act = el("div","actions");
+    const off = el("button","btn ghost","Отключить на этом устройстве");
+    off.onclick = () => askConfirm("Отключить синхронизацию?", "Записи останутся в этом браузере и на GitHub, но перестанут обмениваться. Подключиться снова можно в любой момент.", "Отключить", () => { ghDisconnect(); $("ghDlg").close(); });
+    const close = el("button","btn","Закрыть"); close.onclick = () => $("ghDlg").close();
+    act.append(off, close); b.append(act);
+    $("ghDlg").showModal(); return;
+  }
+  b.append(el("p","sub","Журнал будет храниться в вашем аккаунте GitHub в секретном gist и шифроваться паролем прямо в браузере. Claude для этого не нужен."));
+  const f = el("div");
+  const tokF = el("div","field"), tl = el("label", null, "Ключ доступа GitHub"); tl.htmlFor = "ghToken";
+  const tok = inp("password", "ghp_…", prefill && prefill.token || ""); tok.id = "ghToken"; tok.autocomplete = "off";
+  tokF.append(tl, tok, el("div","hint", prefill && prefill.token ? "Ключ уже вставлен из ссылки подключения." : "Classic-токен только с правом «gist». Как его создать — в инструкции."));
+  const pwF = el("div","field"), pl = el("label", null, "Пароль шифрования"); pl.htmlFor = "ghPass";
+  const pw = inp("password", "Придумайте и запомните", ""); pw.id = "ghPass"; pw.autocomplete = "new-password";
+  pwF.append(pl, pw, el("div","hint","Одинаковый на всех устройствах. Если его забыть, данные с GitHub не восстановить — только из резервной копии."));
+  f.append(tokF, pwF); b.append(f);
+  const st = el("p","hint"); st.setAttribute("role","status"); b.append(st);
+  const act = el("div","actions");
+  const cancel = el("button","btn ghost","Отмена"); cancel.type = "button"; cancel.onclick = () => $("ghDlg").close();
+  const go = el("button","btn","Подключить");
+  go.onclick = async () => {
+    if (!tok.value.trim()){ tok.focus(); return; }
+    if (pw.value.length < 6){ st.textContent = "Пароль шифрования — не короче 6 символов."; pw.focus(); return; }
+    go.disabled = true; st.textContent = "Подключаюсь к GitHub…"; st.classList.add("thinking");
+    try {
+      const login = await ghConnect(tok.value, pw.value);
+      $("ghDlg").close(); render();
+      announce([["a1", "Синхронизация включена"], ["a2", "GitHub: " + login]], 2600);
+    } catch(e){ st.textContent = (e && e.ru) || "Не удалось подключиться."; ghCfg = loadGh(); }
+    st.classList.remove("thinking"); go.disabled = false;
+  };
+  act.append(cancel, go); b.append(act);
+  $("ghDlg").showModal(); (prefill && prefill.token ? pw : tok).focus();
+}
+function loadQr(){
+  if (window.QRCode) return Promise.resolve(true);
+  return new Promise(res => { const sc = document.createElement("script"); sc.src = "https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"; sc.onload = () => res(!!window.QRCode); sc.onerror = () => res(false); document.head.append(sc); });
+}
+
+/* ---------- sound ---------- */
+let actx = null;
+function tone(notes, step = .09, type = "triangle", vol = .15, len = .9){
+  if (!ui.sound) return;
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    notes.forEach((f, i) => {
+      const o = actx.createOscillator(), g = actx.createGain(), t = actx.currentTime + i * step;
+      o.type = type; o.frequency.value = f;
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + .02); g.gain.exponentialRampToValueAtTime(.0001, t + len);
+      o.connect(g).connect(actx.destination); o.start(t); o.stop(t + len + .05);
+    });
+  } catch(e){}
+}
+const sfx = {
+  accept: () => tone([392, 523.25], .08, "triangle", .12, .5),
+  tick:   () => tone([880], .01, "sine", .07, .18),
+  done:   () => tone([659.25, 880, 1318.5], .09),
+  level:  () => tone([523.25, 659.25, 783.99, 1046.5, 1318.5, 1567.98], .11, "triangle", .16, 1.3),
+  ach:    () => tone([987.77, 1318.5, 1975.5], .13, "sine", .13, 1.4),
+  coin:   () => tone([1567.98, 2093], .06, "square", .05, .3)
+};
+function soundIcon(){
+  $("soundBtn").innerHTML = ui.sound
+    ? '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 9a4 4 0 0 1 0 6"/></svg>'
+    : '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M17 9l5 6M22 9l-5 6"/></svg>';
+  $("soundBtn").setAttribute("aria-pressed", String(ui.sound));
+}
+/* ---------- rendering ---------- */
+const PAGE_TABS = { paths:1, stats:1, shop:1, small:1, big:1 };
+function listQuests(){
+  if (ui.tab === "archive") return state.quests.filter(q => q.status === "done" && !q.repeat).sort((a,b) => b.doneAt - a.doneAt);
+  const p = ui.tab, start = periodStart(p);
+  return state.quests.filter(q => q.period === p && (q.status === "active" || q.repeat || (q.doneAt && q.doneAt >= start)));
+}
+function render(){
+  renderTabs();
+  const page = !!PAGE_TABS[ui.tab];
+  $("body").classList.toggle("page-mode", page);
+  $("list").hidden = page; $("detail").hidden = page; $("page").hidden = !page;
+  $("newBtn").hidden = page || ui.tab === "archive";
+  $("completeBtn").hidden = page; $("abandonBtn").hidden = page;
+  if (page){ ({ paths:renderPaths, stats:renderStats, shop:renderShop, small:renderSmall, big:renderBig })[ui.tab](); }
+  else { renderList(); renderDetail(); }
+  renderXp(); renderTracker(); renderButtons(); renderPurse();
+  const active = state.quests.filter(q => q.status === "active" && !isFuture(q)).length;
+  $("count").textContent = active ? `Активных заданий: ${active}` : "Активных заданий нет";
+}
+function renderPurse(){ const p = $("purse"); p.textContent = ""; p.append(moneyNode(state.money)); }
+function renderTabs(){
+  const t = $("tabs"); t.textContent = "";
+  const defs = [["day","День"],["week","Неделя"],["month","Месяц"],["paths","Пути"],["stats","Летопись"],["shop","Лавка"],["small","Торговый список"],["big","Сокровищница"],["archive","Архив"]];
+  for (const [k, label] of defs){
+    const b = el("button","tab"); b.setAttribute("role","tab"); b.setAttribute("aria-selected", String(ui.tab === k));
+    b.append(label);
+    if (PERIODS[k]){
+      const n = state.quests.filter(q => q.period === k && q.status === "active" && !isFuture(q)).length;
+      if (n){ b.append(" "); b.append(el("span","n",`(${n})`)); }
+    } else if (k === "small" || k === "big"){
+      const n = k === "small" ? state.small.filter(x => !x.bought).length : state.big.filter(x => x.status === "active").length;
+      if (n){ b.append(" "); b.append(el("span","n",`(${n})`)); }
+    }
+    b.onclick = () => { if (ui.tab === k) return; ui.tab = k; ui.sel = null; ui.pageAnim = true; $("frame").classList.remove("show-detail"); render(); };
+    t.append(b);
+  }
+}
+function groupList(qs){
+  // returns [{zone, later, items}]
+  if (ui.tab === "archive"){
+    const m = new Map(); for (const q of qs){ if (!m.has(q.zone)) m.set(q.zone, []); m.get(q.zone).push(q); }
+    return [...m].map(([zone, items]) => ({ zone, items }));
+  }
+  const now = qs.filter(q => !isFuture(q)), later = qs.filter(isFuture).sort((a,b) => a.pkey - b.pkey || a.ord - b.ord);
+  const sorted = [...now].sort((a,b) => a.ord - b.ord);
+  const zones = new Map();
+  for (const q of sorted){ if (!zones.has(q.zone)) zones.set(q.zone, []); zones.get(q.zone).push(q); }
+  const groups = [...zones].map(([zone, items]) => ({ zone, items: items.sort((a,b) => (a.status === "done") - (b.status === "done") || a.ord - b.ord) }));
+  if (later.length) groups.push({ zone:"Запланировано", later:true, items:later });
+  return groups;
+}
+function selectQuest(id){
+  ui.sel = id; ui.anim = true;
+  $("frame").classList.add("show-detail");
+  renderList(); renderDetail(); renderButtons();
+  $("detail").scrollTop = 0;
+}
+function renderList(){
+  const list = $("list"); list.textContent = "";
+  const qs = listQuests();
+  if (!qs.length){
+    list.append(el("div","list-empty", ui.tab === "archive"
+      ? "Здесь появятся выполненные задания."
+      : `${PERIODS[ui.tab].list} задания не взяты. Нажмите «Новое задание», чтобы добавить первое.`));
+    return;
+  }
+  for (const g of groupList(qs)){
+    const wrap = el("div","zone");
+    const key = ui.tab + "|" + g.zone, closed = !!ui.collapsed[key];
+    const h = el("button","zone-h" + (g.later ? " later" : "")); h.setAttribute("aria-expanded", String(!closed));
+    h.append(el("span","pm", closed ? "+" : "−"), g.zone);
+    h.onclick = () => { ui.collapsed[key] = !closed; renderList(); };
+    wrap.append(h);
+    if (!closed){
+      for (const q of g.items){
+        const b = el("button", "q" + (q.id === ui.sel ? " sel" : "") + (q.status === "done" ? " done" : ""));
+        b.dataset.id = q.id;
+        const draggable = ui.tab !== "archive" && !g.later && q.status === "active";
+        if (draggable){ const gr = el("span","grip"); gr.setAttribute("aria-hidden","true"); b.append(gr); b.dataset.drag = "1"; }
+        const ready = q.status === "active" && objsDone(q);
+        if (ready) b.append(el("span","mark","?"));
+        if (q.focus && q.status === "active") b.append(el("span","star","★"));
+        for (const pid of qPaths(q)) if (pathOf(pid)) b.append(pathBadge(pathOf(pid)));
+        b.append(el("span","t d" + q.diff, q.title));
+        let meta = "", warn = false;
+        if (q.status === "done") meta = ui.tab === "archive" ? new Date(q.doneAt).toLocaleDateString("ru-RU",{day:"numeric",month:"short"}) : "выполнено";
+        else if (g.later) meta = fmtPkey(q.period, q.pkey);
+        else if (isPast(q)){ meta = PERIODS[q.period].past; warn = true; }
+        else if (ready) meta = "(готово)";
+        else if (q.objectives.length) meta = `${q.objectives.filter(o => o.have >= o.need).length}/${q.objectives.length}`;
+        else if (children(q).length){ const c = children(q); meta = `${c.filter(x => x.status === "done").length}/${c.length} эт.`; }
+        if (meta) b.append(el("span","meta" + (warn ? " warn" : ""), meta));
+        b.onclick = () => { if (dragMoved) return; selectQuest(q.id); };
+        b.onkeydown = ev => {
+          if (ev.altKey && (ev.key === "ArrowUp" || ev.key === "ArrowDown") && draggable){ ev.preventDefault(); nudge(q, ev.key === "ArrowUp" ? -1 : 1); }
+        };
+        wrap.append(b);
+      }
+    }
+    list.append(wrap);
+  }
+}
+
+/* ---------- manual order: drag & keyboard ---------- */
+let drag = null, dragMoved = false;
+function orderedDraggables(){ return [...$("list").querySelectorAll('.q[data-drag="1"]')]; }
+function applyOrder(ids, movedId, targetZone){
+  // ids: display order of draggable quests in this tab
+  const mine = ids.map(byId).filter(Boolean);
+  const all = state.quests.filter(q => q.period === ui.tab && !mine.includes(q)).map(q => q.ord);
+  const base = 0;
+  mine.forEach((q, i) => { q.ord = base + i; });
+  if (movedId && targetZone){ const m = byId(movedId); if (m) m.zone = targetZone; }
+  commit(); renderList();
+  void all;
+}
+function nudge(q, dir){
+  const ids = orderedDraggables().map(e => e.dataset.id);
+  const i = ids.indexOf(q.id), j = i + dir;
+  if (i < 0 || j < 0 || j >= ids.length) return;
+  const other = byId(ids[j]);
+  [ids[i], ids[j]] = [ids[j], ids[i]];
+  applyOrder(ids, q.id, other.zone);
+  const nb = $("list").querySelector(`.q[data-id="${q.id}"]`); if (nb) nb.focus();
+}
+$("list").addEventListener("pointerdown", ev => {
+  const grip = ev.target.closest(".grip"); if (!grip) return;
+  const item = grip.closest(".q"); if (!item) return;
+  ev.preventDefault();
+  drag = { el:item, id:item.dataset.id, y0:ev.clientY, target:null, after:false };
+  dragMoved = false;
+  grip.setPointerCapture(ev.pointerId);
+  item.classList.add("dragging");
+});
+$("list").addEventListener("pointermove", ev => {
+  if (!drag) return;
+  const dy = ev.clientY - drag.y0;
+  if (Math.abs(dy) > 3) dragMoved = true;
+  drag.el.style.transform = `translateY(${dy}px)`;
+  const items = orderedDraggables().filter(e => e !== drag.el);
+  items.forEach(e => e.classList.remove("drop-before","drop-after"));
+  let target = null, after = false;
+  for (const e of items){ const r = e.getBoundingClientRect(); if (ev.clientY < r.top + r.height/2){ target = e; break; } }
+  if (!target && items.length){ target = items[items.length-1]; after = true; }
+  if (target){ target.classList.add(after ? "drop-after" : "drop-before"); drag.target = target; drag.after = after; }
+  // autoscroll
+  const lr = $("list").getBoundingClientRect();
+  if (ev.clientY < lr.top + 30) $("list").scrollTop -= 8; else if (ev.clientY > lr.bottom - 30) $("list").scrollTop += 8;
+});
+function endDrag(){
+  if (!drag) return;
+  const d = drag; drag = null;
+  d.el.classList.remove("dragging"); d.el.style.transform = "";
+  if (dragMoved && d.target){
+    const ids = orderedDraggables().map(e => e.dataset.id).filter(id => id !== d.id);
+    let idx = ids.indexOf(d.target.dataset.id); if (d.after) idx++;
+    ids.splice(idx, 0, d.id);
+    applyOrder(ids, d.id, byId(d.target.dataset.id).zone);
+  } else renderList();
+  setTimeout(() => { dragMoved = false; }, 0);
+}
+$("list").addEventListener("pointerup", endDrag);
+$("list").addEventListener("pointercancel", endDrag);
+
+/* ---------- detail ---------- */
+const selected = () => byId(ui.sel);
+function renderDetail(){
+  const d = $("detail"); if (d.hidden) return; d.textContent = "";
+  const wrap = el("div", ui.anim ? "unroll" : ""); ui.anim = false; d.append(wrap);
+  const q = selected();
+  const back = el("button","back","← К списку"); back.onclick = () => $("frame").classList.remove("show-detail");
+  wrap.append(back);
+  if (!q){
+    const e = el("div","empty");
+    e.append(el("div","big", ui.tab === "archive" ? "?" : "!"));
+    e.append(el("p", null, ui.tab === "archive" ? "Выберите выполненное задание, чтобы перечитать его." : "Выберите задание в списке или возьмите новое."));
+    if (ui.tab !== "archive"){ const b = el("button","btn","Новое задание"); b.onclick = () => openEditor(null); e.append(b); }
+    wrap.append(e); return;
+  }
+  wrap.append(el("h2", null, q.title));
+  const tl = el("div","tagline");
+  tl.append(el("span", "chip d" + q.diff, "◆"), el("span", null, DIFFS[q.diff].name));
+  tl.append(el("span", null, q.zone));
+  const qps = qPaths(q).map(pathOf).filter(Boolean);
+  if (qps.length){ const pc = el("span","chip"); qps.forEach(x => pc.append(pathBadge(x))); pc.append((qps.length > 1 ? "Пути: " : "Путь: ") + qps.map(x => x.name).join(" + ")); tl.append(pc); }
+  if (q.focus && q.status === "active") tl.append(el("span", null, "★ Главное"));
+  if (q.repeat) tl.append(el("span", null, `Повторяется ${PERIODS[q.period].every}`));
+  else if (isFuture(q)) tl.append(el("span", null, "Запланировано: " + fmtPkey(q.period, q.pkey)));
+  if (q.carried) tl.append(el("span", q.carried >= 3 ? "late" : null, `Перенесено ×${q.carried}`));
+  if (q.due){ const late = q.status === "active" && q.due < todayISO(); tl.append(el("span", late ? "late" : null, (late ? "Просрочено: " : "Срок: ") + fmtDate(q.due))); }
+  wrap.append(tl);
+  const parent = q.parentId && byId(q.parentId);
+  if (parent){
+    const p = el("p","sub"); p.style.margin = "8px 0 0"; p.append("Этап цели ");
+    const a = el("button","parent-link", "«" + parent.title + "»"); a.onclick = () => { ui.tab = parent.period; ui.sel = parent.id; ui.anim = true; render(); };
+    p.append(a); wrap.append(p);
+  }
+  if (q.status === "done") wrap.append(el("div","stamp", q.repeat ? `Выполнено — вернётся ${PERIODS[q.period].back}` : "Выполнено " + new Date(q.doneAt).toLocaleDateString("ru-RU",{day:"numeric",month:"long"})));
+
+  if (q.objectives.length){
+    wrap.append(el("h3", null, "Цели задания"));
+    const ul = el("ul","objs");
+    q.objectives.forEach((o, i) => {
+      const li = el("li", o.have >= o.need ? "ok" : "");
+      const editable = q.status === "active";
+      if (o.need === 1){
+        const box = el("button","box", o.have >= 1 ? "✓" : "");
+        box.setAttribute("aria-label", (o.have >= 1 ? "Снять отметку: " : "Отметить: ") + o.t);
+        box.disabled = !editable;
+        box.onclick = () => setObj(q, i, o.have >= 1 ? 0 : 1, true);
+        li.append(box, el("span","txt", o.t));
+      } else {
+        li.append(el("span","txt", o.t));
+        const c = el("span","ctr"), minus = el("button", null, "−"), plus = el("button", null, "+");
+        minus.setAttribute("aria-label","Меньше"); plus.setAttribute("aria-label","Больше");
+        minus.disabled = !editable || o.have <= 0; plus.disabled = !editable || o.have >= o.need;
+        minus.onclick = () => setObj(q, i, o.have - 1); plus.onclick = () => setObj(q, i, o.have + 1);
+        c.append(minus, el("span", null, `${Math.min(o.have,o.need)}/${o.need}`), plus); li.append(c);
+      }
+      ul.append(li);
+    });
+    wrap.append(ul);
+  }
+  const kids = children(q);
+  if (kids.length || (q.period !== "day" && q.status === "active" && !qPaths(q).includes("riddle"))){
+    wrap.append(el("h3", null, "Этапы"));
+    if (kids.length){
+      const doneN = kids.filter(k => k.status === "done").length;
+      const pb = el("div","pbar"), bi = el("i"); bi.style.width = (doneN / kids.length * 100) + "%"; pb.append(bi); wrap.append(pb);
+      const ul = el("ul","steps");
+      kids.sort((a,b) => a.pkey - b.pkey || a.ord - b.ord).forEach(k => {
+        const li = el("li", k.status === "done" ? "ok" : "");
+        li.append(el("span", "d" + k.diff, k.status === "done" ? "✓" : "◆"));
+        const bt = el("button", null, k.title); bt.onclick = () => { ui.tab = k.period; ui.sel = k.id; ui.anim = true; $("frame").classList.add("show-detail"); render(); };
+        li.append(bt, el("span","when", k.repeat ? PERIODS[k.period].every : fmtPkey(k.period, k.pkey)));
+        ul.append(li);
+      });
+      wrap.append(ul);
+    } else wrap.append(el("p","sub","Большую цель проще пройти по шагам. Добавьте этапы вручную или попросите Квестодателя."));
+  }
+  if (q.desc){ wrap.append(el("h3", null, "Описание")); wrap.append(el("p","desc", q.desc)); }
+  if (q.carried >= 3 && q.status === "active"){
+    wrap.append(el("div","note", "Это задание переносится уже " + q.carried + " " + plural(q.carried,"раз","раза","раз") + ". Похоже, оно слишком крупное или неясное: разбейте его на этапы или честно откажитесь."));
+  }
+  wrap.append(el("h3", null, "Награды"));
+  const rw = el("div","rewards");
+  const s1 = el("div","slot"); s1.append(el("div","ico xpg","XP"), el("div","nm", `${questXp(q)} опыта`)); rw.append(s1);
+  const s2 = el("div","slot"); const nm = el("div","nm"); nm.append(moneyNode(questMoney(q)));
+  const coinIco = el("div","ico"); coinIco.style.background = "radial-gradient(circle at 35% 30%,#fff3a0,#c89400 55%,#5a3d00)"; coinIco.textContent = "◎"; coinIco.style.color = "#5a3d00";
+  s2.append(coinIco, nm); rw.append(s2);
+  if (state.rested > 0 && q.status === "active"){ const s3 = el("div","slot"); s3.append(el("div","ico rst","z"), el("div","nm", `+${Math.min(state.rested, Math.round(questXp(q)*.5))} бодрости`)); rw.append(s3); }
+  wrap.append(rw);
+
+  const bar = el("div","dactions");
+  if (q.status === "active"){
+    const e = el("button","btn ghost small","Изменить"); e.onclick = () => openEditor(q);
+    const f = el("button","btn ghost small", q.focus ? "Убрать из главных" : "★ Главное"); f.onclick = () => toggleFocus(q);
+    const t = el("button","btn ghost small", q.tracked ? "Не отслеживать" : "Отслеживать"); t.onclick = () => { q.tracked = !q.tracked; commit(); render(); };
+    bar.append(e, f, t);
+    if (q.period !== "day"){
+      const add = el("button","btn ghost small","Добавить этап"); add.onclick = () => openEditor(null, q); bar.append(add);
+      if (sampleFn){ const ai = el("button","btn ai small","✦ Разбить на этапы"); ai.onclick = () => openBreakdown(q); bar.append(ai); }
+    }
+  } else if (!q.repeat){
+    const b2 = el("button","btn ghost small","Вернуть в журнал");
+    b2.onclick = () => { undoComplete(q); };
+    const del = el("button","btn ghost small","Удалить из архива");
+    del.onclick = () => askConfirm("Удалить из архива?", `«${q.title}» исчезнет из архива. Опыт и золото останутся.`, "Удалить", () => {
+      state.quests = state.quests.filter(x => x.id !== q.id); ui.sel = null; commit(); render();
+    });
+    bar.append(b2, del);
+  }
+  wrap.append(bar);
+}
+function toggleFocus(q){
+  if (!q.focus){
+    const n = state.quests.filter(x => x.focus && x.status === "active" && x.period === q.period && !isFuture(x)).length;
+    if (n >= 3){ announce([["a2", "Главных заданий может быть не больше трёх"]], 2200); return; }
+  }
+  q.focus = !q.focus; commit(); render();
+}
+function setObj(q, i, v, box){
+  const was = objsDone(q);
+  q.objectives[i].have = clamp(v, 0, q.objectives[i].need);
+  sfx.tick(); commit(); renderDetail(); renderList(); renderTracker(); renderButtons();
+  if (box){ const b = $("detail").querySelectorAll(".objs li")[i]; const bx = b && b.querySelector(".box"); if (bx) bx.classList.add("pop"); }
+  if (!was && objsDone(q)){ sfx.accept(); announce([["a1", "Все цели выполнены"], ["a2", "Сдайте задание, чтобы получить награду"]], 2400); }
+}
+function renderButtons(){
+  const q = selected(), canAct = !!(q && q.status === "active");
+  $("completeBtn").disabled = !canAct; $("abandonBtn").disabled = !canAct;
+  $("completeBtn").classList.toggle("glow", !!(canAct && objsDone(q)));
+}
+function renderXp(){
+  const L = levelInfo(state.xp);
+  $("xpFill").style.width = (L.rest / L.need * 100).toFixed(1) + "%";
+  $("xpRest").style.width = (Math.min(L.need, L.rest + state.rested) / L.need * 100).toFixed(1) + "%";
+  $("xpLabel").textContent = `Уровень ${L.lvl} — опыт ${L.rest} / ${L.need}` + (state.rested ? ` (бодрость +${state.rested})` : "");
+}
+function renderTracker(){
+  const t = $("tracker"); t.textContent = "";
+  t.append(el("h4", null, "Задания"));
+  const qs = state.quests.filter(q => q.status === "active" && (q.tracked || q.focus) && !isFuture(q))
+    .sort((a,b) => b.focus - a.focus || PORDER.indexOf(a.period) - PORDER.indexOf(b.period) || a.ord - b.ord).slice(0, 9);
+  if (!qs.length) t.append(el("div","none","Отслеживаемые и главные задания будут видны здесь."));
+  for (const q of qs){
+    const b = el("button","tr-q" + (q.focus ? " focus" : ""));
+    b.append(el("span","tt", (objsDone(q) ? "? " : "") + q.title));
+    for (const o of q.objectives.slice(0, 4)){
+      const ok = o.have >= o.need;
+      b.append(el("span","oo" + (ok ? " ok" : ""), `- ${o.t}${o.need > 1 ? `: ${Math.min(o.have,o.need)}/${o.need}` : ""}`));
+    }
+    b.onclick = () => { ui.tab = q.period; ui.sel = q.id; ui.anim = true; $("frame").classList.add("show-detail"); render(); };
+    t.append(b);
+  }
+  const st = streak();
+  const s = el("div","streak");
+  if (st.cur){ s.append(el("b", null, "🔥 " + st.cur), " " + plural(st.cur,"день","дня","дней") + " подряд" + (st.today ? "" : " — сегодня ещё можно продлить")); }
+  else s.append("Выполните задание сегодня, чтобы начать серию.");
+  t.append(s);
+}
+/* ---------- progress: log, streaks, achievements ---------- */
+function logDay(k = todayISO()){ if (!state.log[k]) state.log[k] = { n:0, xp:0, f:0 }; return state.log[k]; }
+function streak(){
+  const has = k => state.log[k] && state.log[k].n > 0;
+  const d = new Date(); const today = has(dayKey(d));
+  if (!today) d.setDate(d.getDate() - 1);
+  let cur = 0; while (has(dayKey(d))){ cur++; d.setDate(d.getDate() - 1); }
+  return { cur, today, best: Math.max(state.stats.best || 0, cur) };
+}
+function sumLog(fromTs){
+  let n = 0, xp = 0;
+  for (const [k, v] of Object.entries(state.log)){ const [y,m,dd] = k.split("-").map(Number); if (new Date(y,m-1,dd).getTime() >= fromTs){ n += v.n; xp += v.xp; } }
+  return { n, xp };
+}
+function pruneLog(){ const keys = Object.keys(state.log).sort(); while (keys.length > 420) delete state.log[keys.shift()]; }
+const ACH = [
+  { id:"first", name:"Первые шаги", desc:"Выполнить первое задание", pts:10, t:s => s.stats.done >= 1 },
+  { id:"d10", name:"Искатель приключений", desc:"Выполнить 10 заданий", pts:10, t:s => s.stats.done >= 10 },
+  { id:"d50", name:"Ветеран", desc:"Выполнить 50 заданий", pts:25, t:s => s.stats.done >= 50 },
+  { id:"d100", name:"Герой", desc:"Выполнить 100 заданий", pts:50, t:s => s.stats.done >= 100 },
+  { id:"d500", name:"Легенда", desc:"Выполнить 500 заданий", pts:100, t:s => s.stats.done >= 500 },
+  { id:"s3", name:"Неугасимый огонь", desc:"Серия из 3 дней", pts:10, t:() => streak().cur >= 3 },
+  { id:"s7", name:"Семь дней пути", desc:"Серия из 7 дней", pts:25, t:() => streak().cur >= 7 },
+  { id:"s30", name:"Железная воля", desc:"Серия из 30 дней", pts:50, t:() => streak().cur >= 30 },
+  { id:"l5", name:"Подмастерье", desc:"Достичь 5-го уровня", pts:10, t:s => levelInfo(s.xp).lvl >= 5 },
+  { id:"l10", name:"Мастер", desc:"Достичь 10-го уровня", pts:25, t:s => levelInfo(s.xp).lvl >= 10 },
+  { id:"l20", name:"Грандмастер", desc:"Достичь 20-го уровня", pts:50, t:s => levelInfo(s.xp).lvl >= 20 },
+  { id:"epic", name:"Эпическая победа", desc:"Выполнить эпическое задание", pts:15, t:s => s.stats.epic >= 1 },
+  { id:"clean", name:"Чистый стол", desc:"Закрыть все дневные задания (от трёх)", pts:15, t:() => cleanDay() },
+  { id:"week", name:"Недельный поход", desc:"Выполнить недельное задание", pts:10, t:s => (s.stats.weekDone||0) >= 1 },
+  { id:"month", name:"Покоритель месяца", desc:"Выполнить месячное задание", pts:20, t:s => (s.stats.monthDone||0) >= 1 },
+  { id:"chain", name:"Цепь замкнулась", desc:"Пройти все этапы большой цели и сдать её", pts:25, t:s => s.stats.chains >= 1 },
+  { id:"focus3", name:"Главное — главное", desc:"Закрыть три главных задания за день", pts:15, t:s => (s.log[todayISO()]||{}).f >= 3 },
+  { id:"early", name:"Ранняя пташка", desc:"Выполнить задание до 8 утра", pts:10, t:s => s.stats.early >= 1 },
+  { id:"planner", name:"Стратег", desc:"Запланировать задание на завтра", pts:10, t:s => s.stats.planned >= 1 },
+  { id:"brief7", name:"Военный совет", desc:"Провести утренний сбор 7 раз", pts:20, t:s => s.stats.briefs >= 7 },
+  { id:"zones", name:"Мастер на все руки", desc:"Выполнять задания в 4 разных зонах", pts:15, t:s => Object.keys(s.stats.byZone).length >= 4 },
+  { id:"rich", name:"Первый золотой", desc:"Накопить 1 золотой", pts:10, t:s => s.money >= 10000 },
+  { id:"shop", name:"Заслуженный отдых", desc:"Купить награду в лавке", pts:10, t:s => s.stats.bought >= 1 },
+  { id:"harmony", name:"Гармония", desc:"За одну неделю выполнить задания на четырёх разных путях", pts:20, t:() => Object.entries(pathCounts(periodStart("week"), Date.now() + DAY)).filter(([k, v]) => k && k !== "*" && v > 0).length >= 4 },
+  { id:"rank3", name:"Умелец", desc:"Достичь ступени «Умелец» на любом пути", pts:25, t:s => Object.values(s.stats.byPath || {}).some(v => (v.pts||0) >= 200) },
+  { id:"goals", name:"Всё по плану", desc:"Выполнить недельные цели по всем путям, где они заданы (от двух)", pts:25, t:s => { const g = s.paths.filter(x => x.goal > 0); if (g.length < 2) return false; const c = pathCounts(periodStart("week"), Date.now() + DAY); return g.every(x => (c[x.id]||0) >= x.goal); } },
+  { id:"small50", name:"Рачительный хозяин", desc:"Отметить 50 малых покупок", pts:15, t:s => (s.stats.smallBought||0) >= 50 },
+  { id:"bigbuy", name:"Большая сделка", desc:"Совершить крупную покупку из Сокровищницы", pts:20, t:s => (s.stats.bigBought||0) >= 1 },
+  { id:"bigcool", name:"Трезвый расчёт", desc:"Купить крупное после срока остывания и с полной суммой", pts:25, t:s => (s.stats.bigCalm||0) >= 1 },
+  { id:"cold", name:"Холодная голова", desc:"Отказаться от крупной покупки после раздумий", pts:20, t:s => (s.stats.bigRefused||0) >= 1 }
+];
+function cleanDay(){
+  const qs = state.quests.filter(q => q.period === "day" && !isFuture(q) && (q.status === "active" || (q.doneAt && q.doneAt >= periodStart("day"))));
+  return qs.length >= 3 && qs.every(q => q.status === "done");
+}
+const achPoints = () => ACH.filter(a => state.ach[a.id]).reduce((s, a) => s + a.pts, 0);
+function checkAch(){
+  let got = false;
+  for (const a of ACH){ if (!state.ach[a.id]){ let ok = false; try { ok = a.t(state); } catch(e){} if (ok){ state.ach[a.id] = Date.now(); toastQ.push(a); got = true; } } }
+  if (got){ commit(); runToasts(); }
+}
+
+/* ---------- paths: points & ranks ---------- */
+const RANKS = [[0,"Ученик"],[75,"Подмастерье"],[200,"Умелец"],[400,"Искусник"],[700,"Мастер"],[1100,"Великий мастер"]];
+const pathPts = q => Math.max(1, Math.round(questXp(q) / 10));
+function pathRank(pts){
+  let i = 0; while (i + 1 < RANKS.length && pts >= RANKS[i+1][0]) i++;
+  const lo = RANKS[i][0], hi = RANKS[i+1] ? RANKS[i+1][0] : null;
+  return { i, name:RANKS[i][1], lo, hi, next:RANKS[i+1] ? RANKS[i+1][1] : null };
+}
+/* ---------- actions ---------- */
+function complete(){
+  const q = selected(); if (!q || q.status !== "active") return;
+  const before = levelInfo(state.xp).lvl, gain = questXp(q), bonus = Math.min(state.rested, Math.round(gain * .5));
+  q.status = "done"; q.doneAt = Date.now(); q.objectives.forEach(o => o.have = o.need);
+  state.rested -= bonus; state.xp += gain + bonus; state.money += questMoney(q);
+  const L = logDay(); L.n++; L.xp += gain + bonus; if (q.focus) L.f = (L.f||0) + 1;
+  q.gain = gain + bonus;
+  const st = state.stats; st.done++; st.byZone[q.zone] = (st.byZone[q.zone]||0) + 1;
+  const qp = qPaths(q);
+  if (qp.length){
+    const pts = pathPts(q);
+    L.p = L.p || {};
+    if (L.t == null) L.t = sumVals(L.p);
+    if (st.tagged == null) st.tagged = Object.values(st.byPath).reduce((a, v) => a + (v.n || 0), 0);
+    L.t++; st.tagged++;
+    let delay = 3200;
+    for (const pid of qp){
+      L.p[pid] = (L.p[pid]||0) + 1;
+      const bp = st.byPath[pid] = st.byPath[pid] || { n:0, pts:0 }; const before = pathRank(bp.pts);
+      bp.n++; bp.pts += pts;
+      const after = pathRank(bp.pts), pth = pathOf(pid);
+      if (after.i > before.i && pth){ setTimeout(() => announce([["a1", `${pth.name}: ${after.name}`], ["a2", "Новая ступень мастерства"]], 3000, true), delay); delay += 3200; }
+    }
+  }
+  if (q.diff === 4) st.epic++;
+  if (new Date().getHours() < 8) st.early++;
+  if (q.period === "week") st.weekDone = (st.weekDone||0) + 1;
+  if (q.period === "month") st.monthDone = (st.monthDone||0) + 1;
+  const kids = children(q); if (kids.length && kids.every(k => k.status === "done")) st.chains++;
+  st.best = Math.max(st.best||0, streak().cur);
+  pruneLog();
+  const arch = state.quests.filter(x => x.status === "done" && !x.repeat).sort((a,b) => b.doneAt - a.doneAt);
+  if (arch.length > 400){ const drop = new Set(arch.slice(400).map(x => x.id)); state.quests = state.quests.filter(x => !drop.has(x.id)); }
+  commit(); render();
+  const r = $("completeBtn").getBoundingClientRect();
+  floater(`+${gain + bonus} опыта` + (bonus ? ` (${bonus} бодрости)` : ""), r.left + r.width/2, r.top - 8);
+  setTimeout(() => floater("+ монеты", r.left + r.width/2, r.top - 8, "gold"), 350);
+  sparks(r.left + r.width/2, r.top + r.height/2);
+  const fill = $("xpFill"); fill.classList.remove("shine"); void fill.offsetWidth; fill.classList.add("shine");
+  const after = levelInfo(state.xp).lvl;
+  if (after > before){ sfx.level(); announce([["lvl", `Уровень ${after}!`], ["a2", `«${q.title}» — задание выполнено`]], 3800, true); }
+  else { sfx.done(); announce([["a1", `${q.title}: выполнено`], ["a2", `Получено опыта: ${gain + bonus}`]], 3000); }
+  const parent = q.parentId && byId(q.parentId);
+  if (parent && parent.status === "active" && children(parent).every(k => k.status === "done")){
+    setTimeout(() => announce([["a1", "Все этапы пройдены"], ["a2", `Цель «${parent.title}» готова к сдаче`]], 3000), 3100);
+  }
+  setTimeout(checkAch, 900);
+}
+function undoComplete(q){
+  const gain = q.gain || questXp(q), dk = q.doneAt ? dayKey(new Date(q.doneAt)) : todayISO();
+  q.status = "active"; q.doneAt = null; q.pkey = periodStart(q.period); q.gain = 0;
+  state.xp = Math.max(0, state.xp - gain); state.money = Math.max(0, state.money - questMoney(q));
+  const L = logDay(dk); L.n = Math.max(0, L.n - 1); L.xp = Math.max(0, L.xp - gain);
+  const qp = qPaths(q);
+  if (qp.length){
+    L.p = L.p || {};
+    if (L.t == null) L.t = sumVals(L.p);
+    L.t = Math.max(0, L.t - 1);
+    if (state.stats.tagged != null) state.stats.tagged = Math.max(0, state.stats.tagged - 1);
+    for (const pid of qp){
+      if (L.p[pid]) L.p[pid]--;
+      const bp = state.stats.byPath[pid]; if (bp){ bp.n = Math.max(0, bp.n - 1); bp.pts = Math.max(0, bp.pts - pathPts(q)); }
+    }
+  }
+  state.stats.done = Math.max(0, state.stats.done - 1);
+  ui.tab = q.period; commit(); render();
+}
+let confirmCb = null;
+function askConfirm(title, text, yes, cb){ $("cTitle").textContent = title; $("cText").textContent = text; $("cYes").textContent = yes; confirmCb = cb; $("confirmDlg").showModal(); }
+$("cNo").onclick = () => $("confirmDlg").close();
+$("cYes").onclick = () => { $("confirmDlg").close(); if (confirmCb) confirmCb(); };
+function abandon(){
+  const q = selected(); if (!q) return;
+  const kids = children(q).filter(k => k.status === "active");
+  askConfirm("Отказаться от задания?", `«${q.title}» будет удалено из журнала без награды.` + (kids.length ? ` Его этапы останутся в журнале.` : ""), "Отказаться", () => {
+    state.quests = state.quests.filter(x => x.id !== q.id); state.stats.abandoned++; ui.sel = null;
+    $("frame").classList.remove("show-detail"); commit(); render();
+  });
+}
+
+/* ---------- stats page ---------- */
+function pageAnimCls(){ const c = ui.pageAnim ? "unroll" : ""; ui.pageAnim = false; return c; }
+function renderStats(){
+  const p = $("page"); p.textContent = "";
+  const w = el("div", pageAnimCls()); p.append(w);
+  w.append(el("h2", null, "Летопись героя"));
+  w.append(el("p","lead","Каждое выполненное задание оставляет след. Здесь видно, как складываются дни, недели и месяцы."));
+  const L = levelInfo(state.xp), st = streak(), wk = sumLog(periodStart("week")), mo = sumLog(periodStart("month"));
+  const g = el("div","statgrid");
+  const add = (big, small) => { const s = el("div","stat"); s.append(el("b", null, big), el("span", null, small)); g.append(s); };
+  add(L.lvl, "уровень, всего опыта " + state.xp);
+  add(state.stats.done, plural(state.stats.done,"задание выполнено","задания выполнено","заданий выполнено"));
+  add(st.cur, `дней подряд, рекорд ${st.best}`);
+  add(wk.n, "за эту неделю");
+  add(mo.n, "за этот месяц");
+  add(achPoints(), "очков достижений");
+  add(state.stats.carried, "переносов всего");
+  const purse = el("div","stat"); const pb = el("b"); pb.style.fontSize = "1.2rem"; pb.append(moneyNode(state.money)); purse.append(pb, el("span", null, "в кошельке")); g.append(purse);
+  w.append(g);
+
+  w.append(el("h3", null, "Последние 16 недель"));
+  const heat = el("div","heat");
+  const start = new Date(periodStart("week")); start.setDate(start.getDate() - 7*15);
+  const tk = todayISO();
+  for (let i = 0; i < 16*7; i++){
+    const d = new Date(start); d.setDate(start.getDate() + i);
+    const k = dayKey(d), n = (state.log[k]||{}).n || 0;
+    const c = el("i", (n ? "l" + Math.min(4, n <= 1 ? 1 : n <= 3 ? 2 : n <= 6 ? 3 : 4) : "") + (k === tk ? " today" : ""));
+    c.title = d.toLocaleDateString("ru-RU",{day:"numeric",month:"long"}) + ": " + n;
+    if (d > new Date()) c.style.visibility = "hidden";
+    heat.append(c);
+  }
+  w.append(heat);
+  const lg = el("div","legend"); lg.append("меньше");
+  ["rgba(90,55,20,.14)","#e9c46a","#d49b1e","#a8670c","#6e3a02"].forEach(c => { const i = el("i"); i.style.background = c; lg.append(i); });
+  lg.append("больше"); w.append(lg);
+
+  const zones = Object.entries(state.stats.byZone).sort((a,b) => b[1] - a[1]);
+  if (zones.length){
+    w.append(el("h3", null, "По зонам"));
+    const zb = el("div","zbars"), mx = zones[0][1];
+    for (const [z, n] of zones.slice(0, 8)){
+      const r = el("div","zbar"), tr = el("div","tr"), i = el("i"); i.style.width = (n / mx * 100) + "%"; tr.append(i);
+      r.append(el("span", null, z), tr, el("span", null, String(n))); zb.append(r);
+    }
+    w.append(zb);
+  }
+  const got = ACH.filter(a => state.ach[a.id]).length;
+  w.append(el("h3", null, `Достижения — ${got} из ${ACH.length}`));
+  const ag = el("div","achs");
+  for (const a of [...ACH].sort((x,y) => (!!state.ach[y.id]) - (!!state.ach[x.id]))){
+    const c = el("div","ach" + (state.ach[a.id] ? "" : " locked"));
+    const sh = document.createElementNS("http://www.w3.org/2000/svg","svg"); sh.setAttribute("width","34"); sh.setAttribute("height","40"); sh.classList.add("sh");
+    const u = document.createElementNS("http://www.w3.org/2000/svg","use"); u.setAttribute("href","#shield"); sh.append(u);
+    const tx = el("div"); tx.append(el("b", null, a.name), el("span", null, a.desc + (state.ach[a.id] ? " · " + new Date(state.ach[a.id]).toLocaleDateString("ru-RU",{day:"numeric",month:"short"}) : "")));
+    c.append(sh, tx, el("span","pts", String(a.pts)));
+    ag.append(c);
+  }
+  w.append(ag);
+
+  w.append(el("h3", null, "Резервная копия"));
+  w.append(el("p","lead", "Копия — это файл со всеми заданиями, опытом, достижениями и лавкой. Её можно загрузить обратно сюда или в автономную версию журнала, которая работает без Claude."));
+  w.append(el("p","lead", state.lastBackup ? "Последняя копия: " + new Date(state.lastBackup).toLocaleDateString("ru-RU",{day:"numeric",month:"long",year:"numeric"}) + "." : "Копия ещё не сохранялась."));
+  const bk = el("div","dactions"); bk.style.marginTop = "8px";
+  const ex = el("button","btn","Сохранить копию журнала"); ex.onclick = exportJournal;
+  const im = el("button","btn ghost","Загрузить из файла"); im.onclick = () => $("importFile").click();
+  const md = el("button","btn ghost","Заметка для Obsidian (.md)"); md.onclick = exportMarkdown;
+  if (!(window.claude && window.claude.use) || syncState.provider === "gh"){
+    w.append(el("p","lead", syncState.provider === "gh" ? `Синхронизация через GitHub включена (${ghCfg.login}).` : "Синхронизация между устройствами — через ваш аккаунт GitHub, без Claude."));
+    const gb = el("button","btn", syncState.provider === "gh" ? "Настройки GitHub и подключение телефона" : "Подключить GitHub"); gb.onclick = () => openGhDialog();
+    const gw = el("div","dactions"); gw.style.margin = "4px 0 14px"; gw.append(gb); w.append(gw);
+  }
+  bk.append(ex, im, md); w.append(bk);
+  const bs = el("p","hint"); bs.id = "backupSt"; w.append(bs);
+}
+
+/* ---------- shop ---------- */
+function renderShop(){
+  const p = $("page"); p.textContent = "";
+  const w = el("div", pageAnimCls()); p.append(w);
+  w.append(el("h2", null, "Лавка наград"));
+  w.append(el("p","lead","Назначьте цену приятным вещам и покупайте их на золото из заданий. Награда, заработанная делом, радует вдвойне — и тянет браться за следующие задания."));
+  const pu = el("div","purse"); pu.append("В кошельке: ", moneyNode(state.money)); w.append(pu);
+  w.append(el("h3", null, "Товары"));
+  const list = el("div","shop-list");
+  if (!state.rewards.length) list.append(el("p","lead","Пока пусто. Добавьте первую награду: чашку кофе в любимом месте, вечер с книгой, новую вещь для зала."));
+  for (const r of state.rewards){
+    const row = el("div","ware");
+    const ico = el("button","ico", r.icon); ico.style.border = "0"; ico.style.cursor = "pointer"; ico.title = "Сменить значок";
+    ico.onclick = () => { r.icon = WARE_ICONS[(WARE_ICONS.indexOf(r.icon) + 1) % WARE_ICONS.length]; commit(); renderShop(); };
+    const buy = el("button","btn small","Купить"); buy.disabled = state.money < r.price;
+    buy.onclick = () => askConfirm("Купить награду?", `«${r.name}» за ${fmtMoneyText(r.price)}.`, "Купить", () => {
+      state.money -= r.price; state.stats.bought++; commit(); sfx.coin(); render();
+      announce([["a1", "Награда получена"], ["a2", r.name]], 2600); checkAch();
+    });
+    const x = el("button","x","×"); x.setAttribute("aria-label","Убрать товар"); x.onclick = () => { state.rewards = state.rewards.filter(z => z !== r); commit(); renderShop(); };
+    row.append(ico, el("span","nm", r.name), moneyNode(r.price), buy, x);
+    list.append(row);
+  }
+  w.append(list);
+  w.append(el("h3", null, "Новая награда"));
+  const f = el("div","shop-form");
+  const mk = (lbl, inp) => { const d = el("div","field"); d.style.margin = "0"; const l = el("label", null, lbl); l.style.cssText = "display:block;font-family:var(--caps);font-weight:800;margin-bottom:4px;color:var(--ink-head)"; d.append(l, inp); return d; };
+  const nm = el("input"); nm.type = "text"; nm.placeholder = "Кофе в любимой кофейне"; nm.maxLength = 80;
+  const gg = el("input"); gg.type = "number"; gg.min = 0; gg.value = 0;
+  const ss = el("input"); ss.type = "number"; ss.min = 0; ss.max = 99; ss.value = 50;
+  const ok = el("button","btn","Добавить");
+  ok.onclick = () => {
+    const name = nm.value.trim(); if (!name){ nm.focus(); return; }
+    const price = Math.max(1, (parseInt(gg.value,10)||0) * 10000 + clamp(parseInt(ss.value,10)||0, 0, 99) * 100);
+    state.rewards.push({ id:uid(), name, price, icon:WARE_ICONS[state.rewards.length % WARE_ICONS.length] }); commit(); renderShop();
+  };
+  f.append(mk("Название", nm), mk("Золото", gg), mk("Серебро", ss), ok);
+  w.append(f);
+  w.append(el("p","hint", "Ориентир: обычное дневное задание приносит 10 серебра, недельное — 40, месячное — 1 золотой 60 серебра."));
+}
+/* ---------- paths page ---------- */
+function pathCounts(from, to){
+  const res = {}; let total = 0, tagged = 0;
+  for (const [k, v] of Object.entries(state.log)){
+    const [y,m,d] = k.split("-").map(Number), t = new Date(y, m-1, d).getTime();
+    if (t < from || t >= to) continue;
+    total += v.n || 0;
+    tagged += v.t != null ? +v.t || 0 : sumVals(v.p);
+    for (const [pid, n] of Object.entries(v.p || {})) res[pid] = (res[pid]||0) + n;
+  }
+  res[""] = Math.max(0, total - tagged);
+  res["*"] = total;
+  return res;
+}
+function allTimeCounts(){
+  const res = {}; let sum = 0;
+  for (const [pid, v] of Object.entries(state.stats.byPath || {})){ res[pid] = v.n || 0; sum += v.n || 0; }
+  const tagged = state.stats.tagged != null ? state.stats.tagged : sum;
+  res[""] = Math.max(0, (state.stats.done || 0) - tagged);
+  res["*"] = state.stats.done || 0;
+  return res;
+}
+const PERIOD_OPTS = [["day","Сегодня"],["week","Неделя"],["month","Месяц"],["all","Всё время"]];
+function renderPaths(){
+  const p = $("page"); const keep = p.scrollTop; p.textContent = "";
+  const w = el("div", pageAnimCls()); p.append(w);
+  w.append(el("h2", null, "Пути развития"));
+  w.append(el("p","lead","Сколько заданий выполнено по каждому направлению. Задание с двумя путями засчитывается в оба. Задайте пути недельную цель — и журнал покажет, какое направление проседает."));
+  const per = ui.pathPer || "week";
+  const seg = el("div","seg"); seg.setAttribute("role","group"); seg.setAttribute("aria-label","Период");
+  for (const [k, lbl] of PERIOD_OPTS){ const b = el("button", null, lbl); b.setAttribute("aria-pressed", String(per === k)); b.onclick = () => { ui.pathPer = k; renderPaths(); }; seg.append(b); }
+  w.append(seg);
+  const now = Date.now(), end = now + DAY;
+  const counts = per === "all" ? allTimeCounts() : pathCounts(periodStart(per), end);
+  const total = counts["*"] || 0;
+  const rows = [...state.paths.map(x => [x.id, x]), ...(counts[""] ? [["", null]] : [])];
+  const ranked = rows.filter(([id, x]) => x && counts[id]).sort((a, b) => counts[b[0]] - counts[a[0]]);
+  const top = ranked.length && (ranked.length === 1 || counts[ranked[0][0]] > counts[ranked[1][0]]) ? ranked[0] : null;
+  const perWord = { day:"сегодня", week:"за эту неделю", month:"за этот месяц", all:"за всё время" }[per];
+  w.append(el("p","lead", total ? `Выполнено ${perWord}: ${total} ${plural(total,"задание","задания","заданий")}.` + (top && top[1] ? ` Больше всего — ${top[1].name} (${counts[top[0]]}).` : "") : `${perWord[0].toUpperCase() + perWord.slice(1)} пока нет выполненных заданий.`));
+
+  const weekGoals = per === "week";
+  const maxVal = Math.max(1, ...rows.map(([id, x]) => Math.max(counts[id] || 0, weekGoals && x ? x.goal : 0)));
+  const list = el("div","pathrows");
+  const dow = (new Date().getDay() + 6) % 7; // 0 = Monday
+  for (const [id, x] of rows){
+    const n = counts[id] || 0;
+    const r = el("div","prow");
+    r.append(pathBadge(x));
+    const nm = el("div","nm"); nm.append(el("b", null, x ? x.name : "Без пути"), el("span", null, x ? x.desc : "Задания без выбранного пути"));
+    const tr = el("div","ptrack"), fi = el("i"); fi.style.width = (n / maxVal * 100) + "%"; fi.style.background = x ? x.color : "#8a7a60"; tr.append(fi);
+    if (weekGoals && x && x.goal){ const gm = el("span","goalmark"); gm.style.left = `calc(${x.goal / maxVal * 100}% - 1px)`; tr.append(gm); }
+    const val = el("div","val", weekGoals && x && x.goal ? `${n}/${x.goal}` : String(n));
+    r.append(nm, tr, val);
+    if (x){
+      const bp = (state.stats.byPath || {})[id] || { n:0, pts:0 }, rk = pathRank(bp.pts);
+      const active = state.quests.filter(q => qPaths(q).includes(id) && q.status === "active" && !isFuture(q)).length;
+      const sub = el("div","psub");
+      const parts = [`${rk.name} · ${bp.pts} ${plural(bp.pts,"очко","очка","очков")}` + (rk.hi ? `, до «${rk.next}» ${rk.hi - bp.pts}` : "")];
+      if (active) parts.push(`в работе: ${active}`);
+      sub.append(parts.join(" · "));
+      if (weekGoals && x.goal){
+        if (n >= x.goal) sub.append(" · цель недели выполнена ✓");
+        else if (n === 0 && dow >= 3){ sub.append(" · "); sub.append(el("span","warn", "путь заброшен на этой неделе")); }
+        else sub.append(` · до цели недели: ${x.goal - n}`);
+      }
+      r.append(sub);
+      r.title = `${x.name}: ${n} ${plural(n,"задание","задания","заданий")} ${perWord}`;
+    }
+    list.append(r);
+  }
+  w.append(list);
+
+  // last 8 weeks, one row per path
+  w.append(el("h3", null, innerWidth < 600 ? "Последние 5 недель" : "Последние 8 недель"));
+  const NW = innerWidth < 600 ? 5 : 8;
+  const weeks = []; let ws = periodStart("week");
+  for (let i = 0; i < NW; i++){ weeks.unshift(ws); ws = shiftPeriod("week", ws, -1); }
+  const grid = el("div","wkgrid"); grid.style.gridTemplateColumns = `minmax(90px,auto) repeat(${NW}, minmax(30px,1fr))`;
+  grid.append(el("span"));
+  weeks.forEach(t => grid.append(el("span","hd", new Date(t).toLocaleDateString("ru-RU",{ day:"numeric", month:"short" }))));
+  const wc = weeks.map(t => pathCounts(t, shiftPeriod("week", t, 1)));
+  const gridRows = [...state.paths.map(x => [x.id, x]), ...(wc.some(c => c[""]) ? [["", null]] : [])];
+  for (const [id, x] of gridRows){
+    const lb = el("span","lb"); lb.append(pathBadge(x), x ? x.name : "Без пути"); grid.append(lb);
+    const mx = Math.max(1, ...wc.map(c => c[id] || 0));
+    wc.forEach((c, i) => {
+      const n = c[id] || 0, cell = el("span","c" + (i === NW - 1 ? " cur" : ""), n ? String(n) : "");
+      if (n){ const a = Math.round(25 + 60 * n / mx); cell.style.background = `color-mix(in srgb, ${x ? x.color : "#8a7a60"} ${a}%, transparent)`; if (a > 55) cell.style.color = "#fff"; }
+      cell.title = `${x ? x.name : "Без пути"}, неделя с ${new Date(weeks[i]).toLocaleDateString("ru-RU",{ day:"numeric", month:"long" })}: ${n}`;
+      grid.append(cell);
+    });
+  }
+  w.append(grid);
+
+  // settings
+  w.append(el("h3", null, "Настройка путей"));
+  w.append(el("p","hint","Название, описание и недельная цель (сколько заданий этого пути в неделю вы хотите выполнять; 0 — без цели). Нажмите на кружок, чтобы сменить цвет."));
+  const hdr = el("div","pedit hdr"); hdr.append(el("span"), el("span", null, "Название"), el("span","h-desc","Что сюда относится"), el("span", null, "Цель в неделю"), el("span")); w.append(hdr);
+  for (const x of state.paths){
+    const r = el("div","pedit");
+    const bd = el("button","pbadge", x.name.slice(0,1).toUpperCase()); bd.style.background = x.color; bd.title = "Сменить цвет"; bd.setAttribute("aria-label", "Сменить цвет пути " + x.name);
+    bd.onclick = () => { ui.editColor = ui.editColor === x.id ? null : x.id; renderPaths(); };
+    const nmI = inp("text", "Название", x.name); nmI.maxLength = 30; nmI.setAttribute("aria-label","Название пути");
+    nmI.onchange = () => { const v = nmI.value.trim(); if (v){ x.name = v; commit(); render(); } else nmI.value = x.name; };
+    const dsI = inp("text", "Что сюда относится", x.desc, "pd-desc"); dsI.maxLength = 120; dsI.setAttribute("aria-label","Описание пути");
+    dsI.onchange = () => { x.desc = dsI.value.trim(); commit(); };
+    const gI = inp("number", "0", x.goal); gI.min = 0; gI.max = 99; gI.setAttribute("aria-label","Цель в неделю"); gI.title = "Цель в неделю";
+    gI.onchange = () => { x.goal = clamp(parseInt(gI.value, 10) || 0, 0, 99); commit(); renderPaths(); };
+    const del = el("button","ibtn x","×"); del.setAttribute("aria-label","Удалить путь " + x.name);
+    del.onclick = () => {
+      const used = state.quests.filter(q => qPaths(q).includes(x.id) && q.status === "active").length;
+      askConfirm("Удалить путь?", `«${x.name}» исчезнет из списка.` + (used ? ` У ${used} ${plural(used,"активного задания","активных заданий","активных заданий")} путь будет снят.` : "") + " Статистика прошлых заданий сохранится.", "Удалить", () => {
+        state.quests.forEach(q => { if (q.path2 === x.id) q.path2 = ""; if (q.path === x.id){ q.path = q.path2 || ""; q.path2 = ""; } }); state.paths = state.paths.filter(z => z !== x); commit(); render();
+      });
+    };
+    r.append(bd, nmI, dsI, gI, del);
+    w.append(r);
+    if (ui.editColor === x.id){
+      const sw = el("div","swatches"); sw.style.margin = "0 0 10px 42px";
+      for (const c of PATH_COLORS){ const b = el("button","swatch"); b.style.background = c; b.setAttribute("aria-pressed", String(c === x.color)); b.setAttribute("aria-label","Цвет " + c); b.onclick = () => { x.color = c; ui.editColor = null; commit(); render(); }; sw.append(b); }
+      w.append(sw);
+    }
+  }
+  if (state.paths.length < 12){
+    const add = el("button","btn ghost small","Добавить путь");
+    add.onclick = () => { const used = new Set(state.paths.map(z => z.color)); state.paths.push({ id:uid(), name:"Новый путь", desc:"", color:PATH_COLORS.find(c => !used.has(c)) || PATH_COLORS[state.paths.length % PATH_COLORS.length], goal:0, u:0 }); commit(); renderPaths(); const ins = $("page").querySelectorAll(".pedit input[type=text]"); const last = ins[ins.length - 2]; if (last){ last.focus(); last.select(); } };
+    w.append(add);
+  }
+  p.scrollTop = keep;
+}
+
+/* ---------- purchases: Торговый список (small) & Сокровищница (big) ---------- */
+const SMALL_CATS = ["Продукты","Дом","Аптека","Спорт","Одежда","Техника","Подарки","Прочее"];
+const rub = n => Math.round(n).toLocaleString("ru-RU") + " ₽";
+const DAY = 86400000;
+function inp(type, ph, val, cls){ const i = el("input", cls); i.type = type; if (ph) i.placeholder = ph; if (val != null) i.value = val; return i; }
+function labeled(lbl, node){ const d = el("div","field"); d.style.margin = "0"; const l = el("label", null, lbl); l.className = "mini-lbl"; d.append(l, node); return d; }
+function statCard(g, big, small){ const s = el("div","stat"); s.append(el("b", null, big), el("span", null, small)); g.append(s); }
+
+function addSmall(name, qty, price, cat){
+  name = name.trim(); if (!name) return false;
+  state.small.push({ id:uid(), name:name.slice(0,80), qty:String(qty||"").slice(0,20), price:Math.max(0, +price||0), cat:(cat||"").trim().slice(0,30) || "Прочее", bought:0, paid:0, created:Date.now() });
+  return true;
+}
+function renderSmall(){
+  const p = $("page"); const keepScroll = p.scrollTop; p.textContent = "";
+  const w = el("div", pageAnimCls()); p.append(w);
+  w.append(el("h2", null, "Торговый список"));
+  w.append(el("p","lead","Малые покупки: продукты, мелочи для дома, аптека. Отмечайте купленное прямо в магазине — вещь уйдёт в историю, а трата попадёт в итог месяца."));
+  const open = state.small.filter(x => !x.bought), ms = periodStart("month");
+  const monthBought = state.small.filter(x => x.bought >= ms);
+  const g = el("div","statgrid");
+  statCard(g, open.length, plural(open.length,"позиция в списке","позиции в списке","позиций в списке"));
+  statCard(g, rub(open.reduce((a,x) => a + x.price, 0)), "примерно к оплате");
+  statCard(g, rub(monthBought.reduce((a,x) => a + x.paid, 0)), "потрачено в этом месяце");
+  statCard(g, monthBought.length, "покупок в этом месяце");
+  w.append(g);
+
+  w.append(el("h3", null, "Добавить в список"));
+  const f = el("div","buy-form");
+  const nm = inp("text","Молоко", null), qt = inp("text","2 л", null), pr = inp("number","0", null), ct = inp("text","Продукты", null);
+  nm.maxLength = 80; qt.maxLength = 20; pr.min = 0; ct.maxLength = 30; ct.setAttribute("list","smallCats");
+  const dl = el("datalist"); dl.id = "smallCats"; new Set([...SMALL_CATS, ...state.small.map(x => x.cat)]).forEach(c => { const o = el("option"); o.value = c; dl.append(o); });
+  const add = el("button","btn","Добавить");
+  const doAdd = () => { if (!addSmall(nm.value, qt.value, pr.value, ct.value)){ nm.focus(); return; } ui.smallCat = ct.value; commit(); ui.focusSmall = true; render(); };
+  add.onclick = doAdd; [nm, qt, pr, ct].forEach(i => i.addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); doAdd(); } }));
+  if (ui.smallCat) ct.value = ui.smallCat;
+  f.append(labeled("Что купить", nm), labeled("Сколько", qt), labeled("Цена, ₽", pr), labeled("Раздел", ct), add, dl);
+  w.append(f);
+
+  const staples = state.staples.filter(s => !open.some(x => x.name.toLowerCase() === s.name.toLowerCase()));
+  if (staples.length){
+    const ch = el("div","chips"); ch.append(el("span","mini-lbl","Часто покупаю:"));
+    for (const s of staples){ const b = el("button","chip-btn","+ " + s.name); b.onclick = () => { addSmall(s.name, "", s.price, s.cat); commit(); render(); }; ch.append(b); }
+    w.append(ch);
+  }
+
+  w.append(el("h3", null, "Список"));
+  if (!open.length) w.append(el("p","lead","Торговый список пуст. Добавьте то, что нужно купить, — или нажмите на частую покупку выше."));
+  const cats = [...new Set(open.map(x => x.cat))].sort((a,b) => { const ia = SMALL_CATS.indexOf(a), ib = SMALL_CATS.indexOf(b); return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib) || a.localeCompare(b); });
+  for (const c of cats){
+    const items = open.filter(x => x.cat === c).sort((a,b) => a.created - b.created);
+    const h = el("div","cat-h"); h.append(el("span", null, c), el("span","cat-sum", rub(items.reduce((a,x) => a + x.price, 0)))); w.append(h);
+    for (const x of items){
+      const r = el("div","buy-row");
+      const box = el("button","box"); box.setAttribute("aria-label","Куплено: " + x.name);
+      box.onclick = () => { x.bought = Date.now(); x.paid = x.price; state.stats.smallBought = (state.stats.smallBought||0) + 1; pruneSmall(); sfx.tick(); commit(); render(); checkAch(); };
+      const nmS = el("span","bn", x.name); if (x.qty) nmS.append(el("span","bq", " · " + x.qty));
+      const isSt = state.staples.some(s => s.name.toLowerCase() === x.name.toLowerCase());
+      const st = el("button","ibtn" + (isSt ? " on" : ""), isSt ? "★" : "☆"); st.title = isSt ? "Убрать из частых" : "Добавить в частые покупки"; st.setAttribute("aria-label", st.title);
+      st.onclick = () => { if (isSt) state.staples = state.staples.filter(s => s.name.toLowerCase() !== x.name.toLowerCase()); else state.staples.push({ name:x.name, cat:x.cat, price:x.price }); commit(); renderSmall(); };
+      const del = el("button","ibtn x","×"); del.setAttribute("aria-label","Убрать из списка"); del.onclick = () => { state.small = state.small.filter(z => z !== x); commit(); render(); };
+      r.append(box, nmS, el("span","bp", x.price ? rub(x.price) : ""), st, del);
+      w.append(r);
+    }
+  }
+
+  const recent = state.small.filter(x => x.bought).sort((a,b) => b.bought - a.bought).slice(0, 15);
+  if (recent.length){
+    w.append(el("h3", null, "Недавно куплено"));
+    w.append(el("p","hint","Цену можно поправить на фактическую — итог месяца пересчитается."));
+    for (const x of recent){
+      const r = el("div","buy-row done");
+      r.append(el("span","ok-mark","✓"));
+      const nmS = el("span","bn", x.name); nmS.append(el("span","bq", " · " + new Date(x.bought).toLocaleDateString("ru-RU",{day:"numeric",month:"short"})));
+      const pi = inp("number", "0", x.paid || "", "paid"); pi.min = 0; pi.setAttribute("aria-label","Фактическая цена");
+      pi.onchange = () => { x.paid = Math.max(0, +pi.value || 0); commit(); renderSmall(); };
+      const back = el("button","ibtn","↺"); back.title = "Вернуть в список"; back.setAttribute("aria-label", back.title);
+      back.onclick = () => { x.bought = 0; x.paid = 0; state.stats.smallBought = Math.max(0, (state.stats.smallBought||0) - 1); commit(); render(); };
+      r.append(nmS, pi, back); w.append(r);
+    }
+  }
+  p.scrollTop = keepScroll;
+  if (ui.focusSmall){ ui.focusSmall = false; nm.focus(); }
+}
+function pruneSmall(){ const b = state.small.filter(x => x.bought).sort((a,z) => z.bought - a.bought); if (b.length > 500){ const drop = new Set(b.slice(500).map(x => x.id)); state.small = state.small.filter(x => !drop.has(x.id)); } }
+
+function coolLeft(x){ return Math.max(0, Math.ceil((x.created + x.cool * DAY - Date.now()) / DAY)); }
+function renderBig(){
+  const p = $("page"); const keepScroll = p.scrollTop; p.textContent = "";
+  const w = el("div", pageAnimCls()); p.append(w);
+  w.append(el("h2", null, "Сокровищница"));
+  w.append(el("p","lead","Крупные покупки и накопления на них. У каждой цели есть срок остывания: если через месяц вещь всё ещё нужна — это решение, а не импульс."));
+  const act = state.big.filter(x => x.status === "active");
+  const g = el("div","statgrid");
+  statCard(g, act.length, plural(act.length,"цель","цели","целей"));
+  statCard(g, rub(act.reduce((a,x) => a + x.saved, 0)), "накоплено из " + rub(act.reduce((a,x) => a + x.price, 0)));
+  statCard(g, rub(state.big.filter(x => x.status === "bought").reduce((a,x) => a + x.paid, 0)), "потрачено на крупное");
+  statCard(g, rub(state.big.filter(x => x.status === "refused").reduce((a,x) => a + x.price, 0)), "сбережено отказами");
+  w.append(g);
+
+  w.append(el("h3", null, "Новая цель"));
+  const f = el("div","buy-form big");
+  const nm = inp("text","Беговая дорожка", null), pr = inp("number","0", null), cl = el("select");
+  nm.maxLength = 80; pr.min = 0;
+  [["0","Без остывания"],["7","7 дней"],["14","14 дней"],["30","30 дней"],["90","90 дней"]].forEach(([v,t]) => { const o = el("option", null, t); o.value = v; cl.append(o); });
+  cl.value = "30";
+  const add = el("button","btn","В сокровищницу");
+  const doAdd = () => { const n = nm.value.trim(); if (!n){ nm.focus(); return; }
+    state.big.push({ id:uid(), name:n, price:Math.max(0, +pr.value||0), saved:0, notes:"", cool:+cl.value, created:Date.now(), status:"active", closedAt:0, paid:0 });
+    commit(); sfx.accept(); render(); };
+  add.onclick = doAdd; [nm, pr].forEach(i => i.addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); doAdd(); } }));
+  f.append(labeled("Что", nm), labeled("Цена, ₽", pr), labeled("Остывание", cl), add);
+  w.append(f);
+
+  if (!act.length) w.append(el("p","lead", "Здесь будут крупные цели: техника, мебель, поездки, снаряжение."));
+  const grid = el("div","bigcards");
+  const sorted = [...act].sort((a,b) => { const ra = coolLeft(a) === 0 && a.saved >= a.price, rb = coolLeft(b) === 0 && b.saved >= b.price; return rb - ra || (b.saved / (b.price||1)) - (a.saved / (a.price||1)); });
+  for (const x of sorted){
+    const c = el("div","bigcard"), left = coolLeft(x), full = x.price > 0 && x.saved >= x.price;
+    const top = el("div","bc-top");
+    if (ui.editBig === x.id){
+      const en = inp("text", null, x.name), ep = inp("number", null, x.price); ep.min = 0; en.maxLength = 80;
+      const sv = el("button","btn small","Сохранить"); sv.onclick = () => { x.name = en.value.trim() || x.name; x.price = Math.max(0, +ep.value||0); ui.editBig = null; commit(); renderBig(); };
+      const ed = el("div","bc-edit"); ed.append(labeled("Название", en), labeled("Цена, ₽", ep), sv); c.append(ed);
+    } else {
+      top.append(el("h4", null, x.name));
+      const badge = left ? el("span","badge cool", `Остывает: ещё ${left} ${plural(left,"день","дня","дней")}`) : full ? el("span","badge ready","Готово к покупке") : el("span","badge", "Копим");
+      top.append(badge); c.append(top);
+    }
+    const pct = x.price ? Math.min(100, Math.round(x.saved / x.price * 100)) : 0;
+    const bar = el("div","gbar"), fi = el("i"); fi.style.width = pct + "%"; bar.append(fi, el("span", null, pct + "%")); c.append(bar);
+    c.append(el("div","bc-sum", `Накоплено ${rub(x.saved)} из ${rub(x.price)}` + (x.price > x.saved ? ` · осталось ${rub(x.price - x.saved)}` : "")));
+    const sr = el("div","bc-save"); const amt = inp("number","Сумма", null); amt.setAttribute("aria-label","Сумма");
+    const put = el("button","btn small","Отложить"), take = el("button","btn ghost small","Снять");
+    const move = sign => { const v = Math.abs(+amt.value||0); if (!v){ amt.focus(); return; } x.saved = Math.max(0, x.saved + sign * v); commit(); if (sign > 0) sfx.coin(); renderBig();
+      if (sign > 0 && x.price && x.saved >= x.price && x.saved - v < x.price) announce([["a1","Сумма собрана"],["a2", x.name]], 2400); };
+    put.onclick = () => move(1); take.onclick = () => move(-1);
+    amt.addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); move(1); } });
+    sr.append(amt, put, take); c.append(sr);
+    const nt = el("textarea","bc-notes"); nt.placeholder = "Модели, ссылки, за и против…"; nt.value = x.notes; nt.maxLength = 3000;
+    nt.onchange = () => { x.notes = nt.value; commit(); }; c.append(nt);
+    const ac = el("div","bc-act");
+    const buy = el("button","btn small","Купить");
+    buy.onclick = () => askConfirm("Совершить покупку?", `«${x.name}» за ${rub(x.price)}.` + (left ? ` Срок остывания ещё не прошёл — осталось ${left} ${plural(left,"день","дня","дней")}.` : "") + (!full && x.price ? ` Накоплено только ${pct}%.` : ""), "Купить", () => {
+      const calm = !left && full;
+      x.status = "bought"; x.closedAt = Date.now(); x.paid = x.price;
+      state.stats.bigBought = (state.stats.bigBought||0) + 1; if (calm) state.stats.bigCalm = (state.stats.bigCalm||0) + 1;
+      commit(); sfx.done(); render(); announce([["a1","Покупка совершена"],["a2", x.name]], 2600); setTimeout(checkAch, 500);
+    });
+    const ref = el("button","btn ghost small","Передумал");
+    ref.onclick = () => askConfirm("Отказаться от покупки?", `«${x.name}» уйдёт в итоги как отказ. Отложенные ${rub(x.saved)} остаются вашими.`, "Отказаться", () => {
+      x.status = "refused"; x.closedAt = Date.now(); state.stats.bigRefused = (state.stats.bigRefused||0) + 1;
+      commit(); render(); announce([["a1","Холодная голова"],["a2", "Сбережено " + rub(x.price)]], 2600); setTimeout(checkAch, 500);
+    });
+    const ed = el("button","btn ghost small", ui.editBig === x.id ? "Отмена" : "Изменить"); ed.onclick = () => { ui.editBig = ui.editBig === x.id ? null : x.id; renderBig(); };
+    ac.append(buy, ref, ed); c.append(ac);
+    c.append(el("div","bc-date", "Добавлено " + new Date(x.created).toLocaleDateString("ru-RU",{day:"numeric",month:"long"})));
+    grid.append(c);
+  }
+  w.append(grid);
+
+  const closed = state.big.filter(x => x.status !== "active").sort((a,b) => b.closedAt - a.closedAt);
+  if (closed.length){
+    w.append(el("h3", null, "Итоги"));
+    for (const x of closed){
+      const r = el("div","buy-row done");
+      r.append(el("span","ok-mark", x.status === "bought" ? "✓" : "✕"));
+      const nmS = el("span","bn", x.name); nmS.append(el("span","bq", " · " + new Date(x.closedAt).toLocaleDateString("ru-RU",{day:"numeric",month:"short",year:"numeric"}))); r.append(nmS);
+      r.append(el("span","bp", x.status === "bought" ? rub(x.paid) : "отказ, сбережено " + rub(x.price)));
+      const back = el("button","ibtn","↺"); back.title = "Вернуть в цели"; back.setAttribute("aria-label", back.title);
+      back.onclick = () => { if (x.status === "bought") state.stats.bigBought = Math.max(0, (state.stats.bigBought||0) - 1); else state.stats.bigRefused = Math.max(0, (state.stats.bigRefused||0) - 1); x.status = "active"; x.closedAt = 0; x.paid = 0; commit(); render(); };
+      const del = el("button","ibtn x","×"); del.setAttribute("aria-label","Удалить запись"); del.onclick = () => { state.big = state.big.filter(z => z !== x); commit(); renderBig(); };
+      r.append(back, del); w.append(r);
+    }
+  }
+  p.scrollTop = keepScroll;
+}
+
+/* ---------- Markdown export (Obsidian) ---------- */
+const DIFF_DOT = ["⚪","🟢","🟡","🟠","🔴"];
+const PERIOD_HEAD = { day:"☀️ День — ежедневные задания", week:"🗓️ Неделя — еженедельные задания", month:"🌙 Месяц — месячные задания" };
+function mdEsc(t){ return String(t).replace(/\r/g, "").replace(/([\[\]<>])/g, "\\$1"); }
+function mdLines(text, prefix){ return String(text).replace(/\r/g, "").split("\n").map(l => prefix + l); }
+function toMarkdown(){
+  const s = state, L = levelInfo(s.xp), st = streak(), now = new Date(), out = [];
+  const dstr = d => new Date(d).toLocaleDateString("ru-RU", { day:"numeric", month:"long", year:"numeric" });
+  out.push("---", "tags: [журнал-заданий]", "обновлено: " + dayKey(now), "уровень: " + L.lvl, "---", "");
+  out.push("# 📜 Журнал заданий", "");
+  out.push("> [!abstract] Уровень " + L.lvl);
+  out.push(`> Опыт ${L.rest} / ${L.need}` + (s.rested ? ` · бодрость +${s.rested}` : "") + ` · кошелёк: ${fmtMoneyText(s.money)}` + (st.cur ? ` · серия: ${st.cur} ${plural(st.cur,"день","дня","дней")}` : ""));
+  out.push(`> *Снимок журнала от ${dstr(now)} — отметки, сделанные здесь, не попадают обратно в журнал.*`, "");
+  const block = q => {
+    const par = q.parentId && byId(q.parentId);
+    out.push(`> [!todo]${q.status === "done" ? "-" : "+"} ${DIFF_DOT[q.diff]} ${q.focus && q.status === "active" ? "★ " : ""}${mdEsc(q.title)}`);
+    const meta = [q.zone, DIFFS[q.diff].name];
+    const mps = qPaths(q).map(pathOf).filter(Boolean); if (mps.length) meta.push((mps.length > 1 ? "пути: " : "путь: ") + mps.map(x => x.name).join(" + "));
+    if (q.repeat) meta.push("повторяется " + PERIODS[q.period].every);
+    else if (isFuture(q)) meta.push("запланировано: " + fmtPkey(q.period, q.pkey));
+    if (q.due) meta.push("📅 " + q.due);
+    if (q.carried) meta.push("перенесено ×" + q.carried);
+    if (par) meta.push("этап цели «" + mdEsc(par.title) + "»");
+    out.push("> *" + meta.join(" · ") + "*", ">");
+    if (q.objectives.length) q.objectives.forEach(o => out.push(`> - [${o.have >= o.need || q.status === "done" ? "x" : " "}] ${mdEsc(o.t)}${o.need > 1 ? ` — ${Math.min(o.have,o.need)}/${o.need}` : ""}`));
+    else out.push(`> - [${q.status === "done" ? "x" : " "}] Выполнить`);
+    const kids = children(q);
+    if (kids.length){ out.push(">", "> **Этапы:**"); kids.sort((a,b) => a.pkey - b.pkey).forEach(k => out.push(`> - [${k.status === "done" ? "x" : " "}] ${mdEsc(k.title)} (${k.repeat ? PERIODS[k.period].every : fmtPkey(k.period, k.pkey)})`)); }
+    if (q.desc){ out.push(">"); out.push(...mdLines(q.desc, "> ")); }
+    out.push(">", `> **Награда:** ${questXp(q)} опыта · ${fmtMoneyText(questMoney(q))}`, "");
+  };
+  for (const p of PORDER){
+    out.push("## " + PERIOD_HEAD[p], "");
+    const start = periodStart(p);
+    const qs = s.quests.filter(q => q.period === p && (q.status === "active" || (q.repeat && q.doneAt && q.doneAt >= start)));
+    if (!qs.length){ out.push("*Заданий нет.*", ""); continue; }
+    const now_ = qs.filter(q => !isFuture(q)).sort((a,b) => a.ord - b.ord), later = qs.filter(isFuture).sort((a,b) => a.pkey - b.pkey);
+    const zones = [...new Set(now_.map(q => q.zone))];
+    for (const z of zones){ out.push("### " + mdEsc(z), ""); now_.filter(q => q.zone === z).forEach(block); }
+    if (later.length){ out.push("### Запланировано", ""); later.forEach(block); }
+  }
+  const done = s.quests.filter(q => q.status === "done" && !q.repeat).sort((a,b) => b.doneAt - a.doneAt).slice(0, 30);
+  out.push("## ✅ Выполненные задания", "");
+  if (done.length) done.forEach(q => out.push(`- [x] ${DIFF_DOT[q.diff]} ${mdEsc(q.title)} — ${new Date(q.doneAt).toLocaleDateString("ru-RU",{day:"numeric",month:"long"})} · ${mdEsc(q.zone)}`));
+  else out.push("*Пока пусто.*");
+  out.push("");
+
+  out.push("## 🛒 Торговый список", "");
+  const open = s.small.filter(x => !x.bought);
+  if (open.length){
+    const cats = [...new Set(open.map(x => x.cat))].sort((a,b) => { const ia = SMALL_CATS.indexOf(a), ib = SMALL_CATS.indexOf(b); return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib); });
+    for (const c of cats){
+      const items = open.filter(x => x.cat === c);
+      out.push(`### ${mdEsc(c)}` + (items.some(x => x.price) ? ` — ${rub(items.reduce((a,x) => a + x.price, 0))}` : ""), "");
+      items.forEach(x => out.push(`- [ ] ${mdEsc(x.name)}${x.qty ? " · " + mdEsc(x.qty) : ""}${x.price ? " — " + rub(x.price) : ""}`));
+      out.push("");
+    }
+  } else out.push("*Список пуст.*", "");
+  if (s.staples.length) out.push("**Часто покупаю:** " + s.staples.map(x => mdEsc(x.name)).join(", "), "");
+  const ms = periodStart("month"), mb = s.small.filter(x => x.bought >= ms);
+  if (mb.length) out.push(`*Потрачено в этом месяце: ${rub(mb.reduce((a,x) => a + x.paid, 0))} (${mb.length} ${plural(mb.length,"покупка","покупки","покупок")}).*`, "");
+
+  out.push("## 💎 Сокровищница", "");
+  const act = s.big.filter(x => x.status === "active");
+  if (act.length){
+    for (const x of act){
+      const pct = x.price ? Math.min(100, Math.round(x.saved / x.price * 100)) : 0, left = coolLeft(x), n = Math.round(pct / 10);
+      out.push(`### ${mdEsc(x.name)}`, "");
+      out.push(`${"▰".repeat(n)}${"▱".repeat(10 - n)} ${pct}% — накоплено ${rub(x.saved)} из ${rub(x.price)}`, "");
+      out.push(left ? `*Остывает ещё ${left} ${plural(left,"день","дня","дней")}.*` : (x.price && x.saved >= x.price ? "*Готово к покупке.*" : "*Копим.*"), "");
+      if (x.notes){ out.push(...mdLines(x.notes, "> "), ""); }
+    }
+  } else out.push("*Целей нет.*", "");
+  const closed = s.big.filter(x => x.status !== "active");
+  if (closed.length){ out.push("**Итоги:**", ""); closed.forEach(x => out.push(`- ${x.status === "bought" ? "✓ куплено" : "✕ отказ"}: ${mdEsc(x.name)} — ${rub(x.status === "bought" ? x.paid : x.price)}, ${new Date(x.closedAt).toLocaleDateString("ru-RU",{day:"numeric",month:"long",year:"numeric"})}`)); out.push(""); }
+
+  out.push("## 🏪 Лавка наград", "");
+  if (s.rewards.length) s.rewards.forEach(r => out.push(`- ${r.icon} ${mdEsc(r.name)} — ${fmtMoneyText(r.price)}`));
+  else out.push("*Товаров нет.*");
+  out.push("");
+
+  out.push("## 📖 Летопись", "");
+  const wk = sumLog(periodStart("week")), mo = sumLog(periodStart("month"));
+  out.push(`- Уровень ${L.lvl}, всего опыта ${s.xp}`, `- Выполнено заданий: ${s.stats.done}`, `- Серия: ${st.cur}, рекорд ${st.best}`, `- За эту неделю: ${wk.n}, за этот месяц: ${mo.n}`, `- Очки достижений: ${achPoints()}`, "");
+  const got = ACH.filter(a => s.ach[a.id]);
+  out.push(`### Достижения — ${got.length} из ${ACH.length}`, "");
+  if (got.length) got.forEach(a => out.push(`- 🏆 **${a.name}** — ${a.desc} (${new Date(s.ach[a.id]).toLocaleDateString("ru-RU",{day:"numeric",month:"long"})})`));
+  else out.push("*Пока нет.*");
+  out.push("");
+  return out.join("\n");
+}
+async function exportMarkdown(){
+  const st = $("backupSt"), filename = "Журнал заданий.md", data = toMarkdown();
+  if (window.claude && window.claude.use){
+    if (!dlFn){ if (st) st.textContent = "Сохранение файлов недоступно в этом окне."; return; }
+    try { await dlFn.save({ filename, data }); if (st) st.textContent = "Заметка сохранена: " + filename; }
+    catch(e){ if (st) st.textContent = e && e.code === "declined" ? "Сохранение отменено." : "Не удалось сохранить файл."; }
+    return;
+  }
+  const url = URL.createObjectURL(new Blob([data], { type:"text/markdown" }));
+  const a = el("a"); a.href = url; a.download = filename; document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000); if (st) st.textContent = "Заметка сохранена: " + filename;
+}
+
+/* ---------- backup ---------- */
+async function exportJournal(){
+  const st = $("backupSt");
+  const data = JSON.stringify({ app:"questlog", format:2, exported:Date.now(), state }, null, 1);
+  const filename = "журнал-заданий-" + todayISO() + ".json";
+  const done = () => { state.lastBackup = Date.now(); commit(); if (ui.tab === "stats") renderStats(); const s2 = $("backupSt"); if (s2) s2.textContent = "Копия сохранена: " + filename; };
+  if (window.claude && window.claude.use){
+    if (!dlFn){ if (st) st.textContent = "Сохранение файлов недоступно в этом окне. Откройте журнал на claude.ai в браузере."; return; }
+    try { await dlFn.save({ filename, data }); done(); }
+    catch(e){ if (st) st.textContent = e && e.code === "declined" ? "Сохранение отменено." : e && e.code === "rate_limited" ? "Окно сохранения уже открыто." : "Не удалось сохранить файл."; }
+    return;
+  }
+  try {
+    const url = URL.createObjectURL(new Blob([data], { type:"application/json" }));
+    const a = el("a"); a.href = url; a.download = filename; document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000); done();
+  } catch(e){ if (st) st.textContent = "Не удалось сохранить файл."; }
+}
+function importJournal(file){
+  const st = $("backupSt");
+  const r = new FileReader();
+  r.onload = () => {
+    let raw;
+    try { raw = JSON.parse(String(r.result)); } catch(e){ if (st) st.textContent = "Это не файл копии журнала: не удалось прочитать JSON."; return; }
+    const src = raw && raw.state ? raw.state : raw;
+    if (!src || !Array.isArray(src.quests)){ if (st) st.textContent = "В файле нет заданий журнала. Выберите файл, сохранённый кнопкой «Сохранить копию журнала»."; return; }
+    const next = normalize(src);
+    const lvl = levelInfo(next.xp).lvl, n = next.quests.length;
+    const when = raw.exported ? " от " + new Date(raw.exported).toLocaleDateString("ru-RU",{day:"numeric",month:"long"}) : "";
+    askConfirm("Заменить журнал копией?", `Копия${when}: ${n} ${plural(n,"задание","задания","заданий")}, уровень ${lvl}. Текущие записи будут заменены.`, "Заменить", () => {
+      state = next; state.lastBackup = state.lastBackup || Date.now(); refreshRepeats(); ui.sel = null; commit(); render();
+      announce([["a1", "Журнал восстановлен"], ["a2", `${n} ${plural(n,"задание","задания","заданий")}, уровень ${lvl}`]], 2600);
+    });
+  };
+  r.onerror = () => { if (st) st.textContent = "Не удалось прочитать файл."; };
+  r.readAsText(file);
+}
+$("importFile").addEventListener("change", ev => { const f = ev.target.files && ev.target.files[0]; ev.target.value = ""; if (f) importJournal(f); });
+
+function fmtMoneyText(c){ const g = Math.floor(c/10000), s = Math.floor(c/100)%100, cu = c%100; return [g && g + " з", s && s + " с", cu && cu + " м"].filter(Boolean).join(" ") || "0 м"; }
+/* ---------- morning briefing (rollover + focus) ---------- */
+const TIPS = [
+  "Сначала — самое неприятное задание. Остальной день пойдёт легче.",
+  "Три главных задания лучше десяти второстепенных.",
+  "Если задание переносится третий раз — разбейте его на шаги поменьше.",
+  "Вечером запланируйте завтра: утром не придётся решать, с чего начать.",
+  "Добавьте в лавку награду, ради которой хочется поработать.",
+  "Короткое задание на 5 минут сохраняет серию даже в тяжёлый день.",
+  "Раз в неделю загляните в «Летопись» и решите, что взять на следующую."
+];
+function maybeBrief(){
+  if (!booted || $("briefDlg").open || $("dlg").open) return;
+  if (!state.quests.length) return;
+  if (state.lastBrief !== todayISO()) openBrief();
+}
+function openBrief(){
+  const b = $("briefBody"); b.textContent = "";
+  const now = new Date();
+  b.append(el("h2", null, "Утренний сбор"));
+  const sub = el("p","sub", now.toLocaleDateString("ru-RU",{weekday:"long", day:"numeric", month:"long"})); sub.style.textTransform = "none"; b.append(sub);
+  const st = streak();
+  b.append(el("p", null, st.cur ? `Серия: ${st.cur} ${plural(st.cur,"день","дня","дней")} подряд. ${st.today ? "Сегодня уже есть победа." : "Выполните хотя бы одно задание, чтобы её продлить."}` : "Сегодня можно начать новую серию — хватит одного выполненного задания."));
+  if (now.getDay() === 1){
+    const lw = shiftPeriod("week", periodStart("week"), -1), s = sumLogRange(lw, periodStart("week"));
+    b.append(el("p","sub", `Итоги прошлой недели: ${s.n} ${plural(s.n,"задание","задания","заданий")}, ${s.xp} опыта.`));
+  }
+  const wcnt = pathCounts(periodStart("week"), Date.now() + DAY);
+  const behind = state.paths.filter(x => x.goal > 0 && (wcnt[x.id]||0) < x.goal);
+  if (behind.length) b.append(el("p","sub", "Недельные цели по путям: " + behind.map(x => `${x.name} ${wcnt[x.id]||0}/${x.goal}`).join(", ") + "."));
+  const past = state.quests.filter(isPast);
+  const carryBoxes = [];
+  if (past.length){
+    b.append(el("h3", null, "Незавершённые задания"));
+    b.append(el("p","hint","Отмеченные переедут в текущий период, с остальных будет снято задание."));
+    const ul = el("ul","pick");
+    for (const q of past){
+      const li = el("li"), cb = el("input"); cb.type = "checkbox"; cb.checked = true; cb.id = "cr_" + q.id;
+      const lab = el("label"); lab.htmlFor = cb.id; lab.append(el("span","pt", q.title), el("div","pd", PERIODS[q.period].list + " · " + PERIODS[q.period].past + (q.carried ? ` · уже переносилось ×${q.carried}` : "")));
+      li.append(cb, lab); ul.append(li); carryBoxes.push([q, cb]);
+    }
+    b.append(ul);
+  }
+  const today = state.quests.filter(q => q.period === "day" && q.status === "active" && !isFuture(q));
+  const focusBoxes = [];
+  b.append(el("h3", null, "Главные задания дня"));
+  if (today.length){
+    b.append(el("p","hint","Выберите до трёх — они будут отмечены звездой и первыми появятся в трекере."));
+    const ul = el("ul","pick");
+    for (const q of today){
+      const li = el("li"), cb = el("input"); cb.type = "checkbox"; cb.checked = q.focus; cb.id = "fc_" + q.id;
+      cb.onchange = () => { if (focusBoxes.filter(([,c]) => c.checked).length > 3) cb.checked = false; };
+      const lab = el("label"); lab.htmlFor = cb.id; lab.append(el("span","pt d" + q.diff, q.title)); lab.firstChild.style.textShadow = "1px 1px 0 #000";
+      li.append(cb, lab); ul.append(li); focusBoxes.push([q, cb]);
+    }
+    b.append(ul);
+  } else b.append(el("p","hint","На сегодня дневных заданий нет — добавьте их после сбора."));
+  b.append(el("div","note", TIPS[Math.floor(Date.now() / 86400000) % TIPS.length]));
+  const act = el("div","actions");
+  const later = el("button","btn ghost","Позже"); later.onclick = () => $("briefDlg").close();
+  const fresh = state.lastBrief !== todayISO();
+  const go = el("button","btn", fresh ? "Выступить в путь (+150 бодрости)" : "Готово");
+  go.onclick = () => {
+    for (const [q, cb] of carryBoxes){
+      if (cb.checked){ q.pkey = periodStart(q.period); q.carried++; state.stats.carried++; }
+      else { state.quests = state.quests.filter(x => x !== q); state.stats.abandoned++; if (ui.sel === q.id) ui.sel = null; }
+    }
+    for (const [q, cb] of focusBoxes) q.focus = cb.checked;
+    if (fresh){ state.lastBrief = todayISO(); state.rested = Math.min(600, state.rested + 150); state.stats.briefs++; }
+    $("briefDlg").close(); commit(); render();
+    if (fresh){ sfx.accept(); announce([["a1", "В путь!"], ["a2", "Бодрость +150: следующие задания дадут больше опыта"]], 2800); }
+    setTimeout(checkAch, 600);
+  };
+  act.append(later, go); b.append(act);
+  $("briefDlg").showModal();
+}
+function sumLogRange(a, z){ let n = 0, xp = 0; for (const [k, v] of Object.entries(state.log)){ const [y,m,d] = k.split("-").map(Number); const t = new Date(y,m-1,d).getTime(); if (t >= a && t < z){ n += v.n; xp += v.xp; } } return { n, xp }; }
+
+/* ---------- editor ---------- */
+let sampleFn = null, aiCtl = null, dlFn = null;
+function objRow(o = { t:"", need:1, have:0 }){
+  const r = el("div","obj-row");
+  const t = el("input"); t.type = "text"; t.placeholder = "Что сделать"; t.value = o.t; t.maxLength = 140; t.className = "ot";
+  const n = el("input"); n.type = "number"; n.min = 1; n.max = 9999; n.value = o.need; n.className = "on"; n.setAttribute("aria-label","Сколько раз");
+  r.dataset.have = o.have || 0;
+  const rm = el("button","rm","×"); rm.type = "button"; rm.setAttribute("aria-label","Убрать задачу"); rm.onclick = () => r.remove();
+  r.append(t, n, rm); return r;
+}
+function setObjRows(list){ const ob = $("fObjs"); ob.textContent = ""; (list.length ? list : [{ t:"", need:1, have:0 }]).forEach(o => ob.append(objRow(o))); }
+function setDiff(cur){
+  const dg = $("fDiff"); dg.textContent = "";
+  DIFFS.forEach((df, i) => { const lab = el("label"), inp = el("input"); inp.type = "radio"; inp.name = "diff"; inp.value = i; inp.checked = i === cur; lab.append(inp, el("span","d" + i, df.name)); dg.append(lab); });
+}
+const pathOf = id => state.paths.find(p => p.id === id) || null;
+const qPaths = q => [q.path, q.path2].filter((x, i, a) => x && a.indexOf(x) === i);
+const sumVals = o => Object.values(o || {}).reduce((a, b) => a + (+b || 0), 0);
+function pathBadge(p){ const b = el("span","pbadge", p ? p.name.slice(0,1).toUpperCase() : "·"); b.style.background = p ? p.color : "#6b5a44"; b.setAttribute("aria-hidden","true"); return b; }
+let pickOrder = [];
+function setPathPick(cur, cur2){
+  pickOrder = [cur, cur2].filter((x, i, a) => x && pathOf(x) && a.indexOf(x) === i).slice(0, 2);
+  const g = $("fPath"); g.textContent = "";
+  const opts = [...state.paths.map(p => [p.id, p]), ["", null]];
+  for (const [id, p] of opts){
+    const lab = el("label"), inp = el("input"); inp.type = "checkbox"; inp.name = "path"; inp.value = id;
+    inp.checked = id ? pickOrder.includes(id) : !pickOrder.length;
+    inp.onchange = () => {
+      ui.pathTouched = true;
+      if (!id) pickOrder = [];
+      else if (inp.checked){ pickOrder = pickOrder.filter(x => x !== id); pickOrder.push(id); if (pickOrder.length > 2) pickOrder.shift(); }
+      else pickOrder = pickOrder.filter(x => x !== id);
+      syncPathChecks(); updatePathHint();
+    };
+    const sp = el("span","pchip"); sp.append(pathBadge(p), p ? p.name : "Без пути");
+    lab.append(inp, sp); lab.title = p ? p.desc : "Не относить ни к одному пути"; g.append(lab);
+  }
+  updatePathHint();
+}
+function syncPathChecks(){ for (const i of $("fPath").querySelectorAll("input")) i.checked = i.value ? pickOrder.includes(i.value) : !pickOrder.length; }
+const pickedPaths = () => pickOrder.slice(0, 2);
+const pickedPath = () => pickedPaths()[0] || "";
+function updatePathHint(){
+  const ps = pickedPaths().map(pathOf).filter(Boolean);
+  $("pathHint").textContent = !ps.length ? "Можно выбрать до двух путей: задание засчитается в оба. Пути настраиваются во вкладке «Пути»."
+    : ps.length === 1 ? ps[0].name + ": " + (ps[0].desc || "") + ". Можно добавить второй путь."
+    : "Засчитается в оба пути: " + ps.map(p => p.name).join(" и ") + ".";
+}
+function guessPath(zone){
+  const z = zone.trim().toLowerCase(); if (!z) return "";
+  const cnt = {}; for (const q of state.quests) if (q.path && q.zone.toLowerCase() === z) cnt[q.path] = (cnt[q.path]||0) + 1;
+  const best = Object.entries(cnt).sort((a,b) => b[1] - a[1])[0];
+  if (best && pathOf(best[0])) return best[0];
+  const hints = { riddle:["загадк","термин","вопрос","практик"], trial:["экзам","испытан","алголог","аттестац","аккредит"], craft:["клиник","работ","наук","отделен","больниц","пациент"], body:["трениров","спорт","зал","бег","здоров"], home:["дом","быт","покуп","квартир"], mind:["книг","чтен","язык","учеб"], soft:["общен","команд","переговор","выступ"], spirit:["отдых","семь","хобби","друз"] };
+  for (const [id, keys] of Object.entries(hints)) if (pathOf(id) && keys.some(k => z.includes(k))) return id;
+  return "";
+}
+$("fZone").addEventListener("change", () => { if (ui.pathTouched || pickedPath()) return; const g = guessPath($("fZone").value); if (g) setPathPick(g, g === "trial" && pathOf("craft") ? "craft" : ""); });
+function fillZones(){ const set = new Set([...state.quests.map(q => q.zone), ...DEFAULT_ZONES]); const dl = $("zones"); dl.textContent = ""; for (const z of set){ const o = el("option"); o.value = z; dl.append(o); } }
+function syncPeriodUi(keepPkey, keepPrev){
+  const p = $("fPeriod").value;
+  $("repeatTxt").textContent = "Повторять " + PERIODS[p].every;
+  const w = $("fWhen"); const prev = w.value; w.textContent = "";
+  PERIODS[p].when.forEach((lbl, i) => { const o = el("option", null, lbl); o.value = String(i); w.append(o); });
+  if (keepPkey){
+    const cur = periodStart(p);
+    if (keepPkey === cur) w.value = "0";
+    else if (keepPkey === shiftPeriod(p, cur, 1)) w.value = "1";
+    else if (keepPkey > cur){ const o = el("option", null, fmtPkey(p, keepPkey)); o.value = "keep"; w.append(o); w.value = "keep"; }
+    else w.value = "0";
+  } else if (keepPrev && prev === "1") w.value = "1";
+  w.disabled = $("fRepeat").checked;
+}
+function openEditor(q, parent){
+  ui.editing = q ? q.id : null; ui.parent = parent ? parent.id : (q ? q.parentId : null);
+  $("formTitle").textContent = q ? "Изменить задание" : parent ? "Новый этап" : "Новое задание";
+  $("saveBtn").textContent = q ? "Сохранить" : "Принять задание";
+  const par = ui.parent && byId(ui.parent);
+  $("formSub").hidden = !par; if (par) $("formSub").textContent = "Этап цели «" + par.title + "»";
+  $("fTitle").value = q ? q.title : ""; $("fDesc").value = q ? q.desc : "";
+  $("fPeriod").value = q ? q.period : parent ? (parent.period === "month" ? "week" : "day") : (PERIODS[ui.tab] ? ui.tab : "day");
+  $("fZone").value = q ? q.zone : parent ? parent.zone : "";
+  $("fDue").value = q ? q.due : "";
+  $("fRepeat").checked = q ? q.repeat : false; $("fTrack").checked = q ? q.tracked : true; $("fFocus").checked = q ? q.focus : false;
+  setDiff(q ? q.diff : 2); setObjRows(q ? q.objectives : []);
+  ui.pathTouched = !!q; setPathPick(q ? q.path : parent ? parent.path : "", q ? q.path2 : parent ? parent.path2 : "");
+  fillZones(); syncPeriodUi(q ? q.pkey : null);
+  $("aiBox").hidden = !sampleFn; $("aiSt").textContent = "Напишите суть задачи — Квестодатель оформит описание и разобьёт на шаги.";
+  $("dlg").showModal(); $("fTitle").focus();
+}
+$("fPeriod").onchange = () => syncPeriodUi(null, true);
+$("fRepeat").onchange = () => { $("fWhen").disabled = $("fRepeat").checked; };
+$("addObj").onclick = () => { const r = objRow(); $("fObjs").append(r); r.querySelector(".ot").focus(); };
+$("cancelBtn").onclick = () => { if (aiCtl) aiCtl.abort(); $("dlg").close(); };
+$("dlg").addEventListener("close", () => { if (aiCtl) aiCtl.abort(); });
+$("form").addEventListener("submit", ev => {
+  ev.preventDefault();
+  const title = $("fTitle").value.trim(); if (!title){ $("fTitle").focus(); return; }
+  const objectives = [...$("fObjs").querySelectorAll(".obj-row")].map(r => {
+    const need = clamp(parseInt(r.querySelector(".on").value, 10) || 1, 1, 9999);
+    return { t:r.querySelector(".ot").value.trim(), need, have:Math.min(need, Number(r.dataset.have) || 0) };
+  }).filter(o => o.t);
+  const period = $("fPeriod").value, whenV = $("fWhen").value;
+  const data = { title, desc:$("fDesc").value.trim(), period, zone:$("fZone").value.trim() || "Прочее", path:pickedPaths()[0] || "", path2:pickedPaths()[1] || "",
+    diff:Number((document.querySelector('input[name="diff"]:checked') || {}).value || 2),
+    objectives, due:$("fDue").value, repeat:$("fRepeat").checked, tracked:$("fTrack").checked, focus:$("fFocus").checked };
+  let q = ui.editing && byId(ui.editing);
+  if (whenV !== "keep" || !q || q.period !== period) data.pkey = shiftPeriod(period, periodStart(period), whenV === "1" ? 1 : 0);
+  if (q) Object.assign(q, data);
+  else {
+    const maxOrd = Math.max(-1, ...state.quests.filter(x => x.period === period).map(x => x.ord));
+    q = { id:uid(), created:Date.now(), status:"active", doneAt:null, carried:0, parentId:ui.parent || null, ord:maxOrd + 1, ...data };
+    state.quests.push(q);
+    if (period === "day" && whenV === "1") state.stats.planned++;
+  }
+  const isNew = !ui.editing;
+  ui.tab = q.period; ui.sel = q.id; ui.anim = true;
+  $("dlg").close(); commit(); render(); $("frame").classList.add("show-detail");
+  if (isNew){ sfx.accept(); announce([["a1", "Задание принято"], ["a2", q.title]], 2200); setTimeout(checkAch, 600); }
+});
+
+/* ---------- AI quest giver ---------- */
+function aiErr(e){
+  const c = e && e.code;
+  if (c === "cancelled") return "Остановлено.";
+  if (c === "not_granted" || c === "sampling_disabled" || c === "not_declared") return "Квестодатель недоступен: доступ к Claude не разрешён.";
+  if (c === "rate_limited") return "Квестодатель утомился. Попробуйте через минуту.";
+  if (c === "session_expired") return "Сессия истекла — обновите страницу.";
+  return "Квестодатель не смог ответить. Попробуйте ещё раз.";
+}
+$("aiBtn").onclick = async () => {
+  if (aiCtl){ aiCtl.abort(); return; }
+  const title = $("fTitle").value.trim(), desc = $("fDesc").value.trim();
+  if (!title && !desc){ $("aiSt").textContent = "Сначала напишите хотя бы пару слов о задаче."; $("fTitle").focus(); return; }
+  const period = $("fPeriod").value, zone = $("fZone").value.trim();
+  const prompt = `Ты — Квестодатель из фэнтези-мира, который помогает человеку планировать реальные дела. Преврати заметку в задание для журнала заданий.
+
+Заметка:
+- название: ${title || "(нет)"}
+- описание: ${desc || "(нет)"}
+- период: ${PERIODS[period].tab.toLowerCase()}
+- зона: ${zone || "(не задана)"}
+- пути: ${pickedPaths().map(x => pathOf(x).name).join(", ") || "(не выбраны)"}
+
+Пути развития (id — описание):
+${state.paths.map(p => `${p.id} — ${p.name}: ${p.desc}`).join("\n")}
+
+Правила:
+- title: короткое понятное название реального дела (до 60 символов). Лёгкий фэнтезийный оттенок допустим, но суть должна считываться сразу.
+- desc: 2–4 предложения в стиле квестодателя (обращение «герой» или на «ты»), но с конкретикой: что сделать и зачем это важно. Без выдуманных фактов о человеке.
+- objectives: 1–6 конкретных проверяемых шагов (t до 60 символов). need — сколько раз повторить, обычно 1; число больше 1 только для повторяющихся действий (подходы, страницы, звонки).
+- diff: 0–4 по реальной трудоёмкости (0 пустяк, 1 лёгкое, 2 обычное, 3 сложное, 4 эпическое).
+- zone: одно-два слова; если зона задана — верни её без изменений.
+- paths: массив из 1–2 id путей развития из списка, к которым задание относится (второй — только если задание явно развивает и его); [] если ни один не подходит.
+Всё на русском.
+
+Ответь только JSON вида {"title":"...","desc":"...","objectives":[{"t":"...","need":1}],"diff":2,"zone":"...","paths":["craft"]}`;
+  aiCtl = new AbortController();
+  $("aiBtn").textContent = "Стоп"; $("aiSt").textContent = "Квестодатель размышляет"; $("aiSt").classList.add("thinking");
+  try {
+    const r = await sampleFn.json(prompt, { modelTier:"quick", signal:aiCtl.signal });
+    if (r && typeof r === "object"){
+      if (r.title) $("fTitle").value = String(r.title).slice(0, 120);
+      if (r.desc) $("fDesc").value = String(r.desc).slice(0, 4000);
+      if (Array.isArray(r.objectives) && r.objectives.length) setObjRows(r.objectives.slice(0, 8).map(o => ({ t:String(o.t||"").slice(0,140), need:clamp(+o.need||1, 1, 9999), have:0 })).filter(o => o.t));
+      if (Number.isFinite(+r.diff)) setDiff(clamp(Math.round(+r.diff), 0, 4));
+      if (!zone && r.zone) $("fZone").value = String(r.zone).slice(0, 40);
+      if (!pickedPath()){ const ai = (Array.isArray(r.paths) ? r.paths : [r.path]).map(String).filter(x => pathOf(x)); if (ai.length) setPathPick(ai[0], ai[1] || ""); }
+      $("aiSt").textContent = "Готово. Поправьте что нужно и примите задание.";
+    } else $("aiSt").textContent = "Ответ не удалось разобрать. Попробуйте ещё раз.";
+  } catch(e){ $("aiSt").textContent = aiErr(e); }
+  $("aiSt").classList.remove("thinking"); $("aiBtn").textContent = "✦ Спросить Квестодателя"; aiCtl = null;
+};
+
+/* ---------- AI breakdown into steps ---------- */
+function slotsFor(parent){
+  const childP = parent.period === "month" ? "week" : "day";
+  const end = shiftPeriod(parent.period, parent.pkey, 1);
+  let p = Math.max(periodStart(childP), periodStart(childP, new Date(parent.pkey)));
+  const out = []; while (p < end && out.length < 10){ out.push(p); p = shiftPeriod(childP, p, 1); }
+  if (!out.length) out.push(periodStart(childP));
+  return { childP, slots:out };
+}
+async function openBreakdown(parent){
+  const b = $("breakBody"); b.textContent = "";
+  const { childP, slots } = slotsFor(parent);
+  b.append(el("h2", null, "Квестодатель"));
+  b.append(el("p","sub", `Разбивает цель «${parent.title}» на ${childP === "week" ? "недельные" : "дневные"} этапы.`));
+  const st = el("p", "thinking", "Изучает карту"); b.append(st);
+  const act = el("div","actions"); const stop = el("button","btn ghost","Отмена"); act.append(stop); b.append(act);
+  const ctl = new AbortController(); stop.onclick = () => { ctl.abort(); $("breakDlg").close(); };
+  $("breakDlg").onclose = () => ctl.abort();
+  $("breakDlg").showModal();
+  const kids = children(parent).map(k => "- " + k.title).join("\n");
+  const prompt = `Ты — Квестодатель из фэнтези-мира, помогающий человеку достигать реальных целей. Разбей большую цель на ${childP === "week" ? "недельные" : "дневные"} этапы.
+
+Цель: ${parent.title}
+Описание: ${parent.desc || "(нет)"}
+Цели задания: ${parent.objectives.map(o => o.t + (o.need > 1 ? " ×" + o.need : "")).join("; ") || "(нет)"}
+Зона: ${parent.zone}
+${kids ? "Уже есть этапы (не повторяй их):\n" + kids : ""}
+
+Доступные слоты по времени (slot — номер):
+${slots.map((s, i) => `${i} — ${fmtPkey(childP, s)}`).join("\n")}
+
+Правила: 3–8 этапов, реалистичных по объёму для ${childP === "week" ? "одной недели" : "одного дня"}, от простого к сложному; распредели их по слотам равномерно, первый шаг — в слот 0. title — понятное название дела до 60 символов (лёгкий фэнтезийный оттенок допустим). desc — 1–2 предложения в стиле квестодателя, конкретно. objectives — 1–4 проверяемых шага (need обычно 1). diff 0–4. Всё на русском.
+
+Ответь только JSON вида {"steps":[{"title":"...","desc":"...","objectives":[{"t":"...","need":1}],"diff":2,"slot":0}]}`;
+  let res;
+  try { res = await sampleFn.json(prompt, { modelTier:"default", signal:ctl.signal }); }
+  catch(e){ st.classList.remove("thinking"); st.textContent = aiErr(e); stop.textContent = "Закрыть"; return; }
+  const steps = (res && Array.isArray(res.steps) ? res.steps : []).filter(s => s && s.title).slice(0, 10);
+  st.classList.remove("thinking");
+  if (!steps.length){ st.textContent = "Квестодатель не предложил этапов. Попробуйте ещё раз."; stop.textContent = "Закрыть"; return; }
+  st.textContent = "Отметьте этапы, которые берёте, и при необходимости поменяйте время.";
+  const ul = el("ul","pick"), rows = [];
+  for (const s of steps){
+    const li = el("li"), cb = el("input"); cb.type = "checkbox"; cb.checked = true;
+    const body = el("div"); body.style.flex = "1";
+    const t = el("div","pt d" + clamp(+s.diff||2,0,4), String(s.title).slice(0,120)); t.style.textShadow = "1px 1px 0 #000";
+    body.append(t);
+    if (s.desc) body.append(el("div","pd", String(s.desc)));
+    if (Array.isArray(s.objectives) && s.objectives.length) body.append(el("div","pd", "• " + s.objectives.map(o => o.t).join(" • ")));
+    const sel = el("select"); slots.forEach((sl, i) => { const o = el("option", null, fmtPkey(childP, sl)); o.value = i; sel.append(o); });
+    sel.value = String(clamp(parseInt(s.slot,10)||0, 0, slots.length - 1)); sel.setAttribute("aria-label","Когда");
+    li.append(cb, body, sel); ul.append(li); rows.push([s, cb, sel]);
+  }
+  b.insertBefore(ul, act);
+  const ok = el("button","btn","Принять этапы");
+  ok.onclick = () => {
+    let n = 0, ord = Math.max(-1, ...state.quests.filter(x => x.period === childP).map(x => x.ord));
+    for (const [s, cb, sel] of rows){
+      if (!cb.checked) continue;
+      state.quests.push({ id:uid(), title:String(s.title).slice(0,120), desc:String(s.desc||"").slice(0,4000), period:childP, zone:parent.zone,
+        diff:clamp(Math.round(+s.diff||2),0,4), objectives:(Array.isArray(s.objectives)?s.objectives:[]).slice(0,8).map(o => ({ t:String(o.t||"").slice(0,140), need:clamp(+o.need||1,1,9999), have:0 })).filter(o => o.t),
+        due:"", repeat:false, tracked:true, focus:false, created:Date.now(), status:"active", doneAt:null,
+        pkey:slots[+sel.value], ord:++ord, carried:0, parentId:parent.id, path:parent.path || "", path2:parent.path2 || "" });
+      n++;
+    }
+    $("breakDlg").onclose = null; $("breakDlg").close();
+    if (n){ commit(); render(); sfx.accept(); announce([["a1", "Цепочка заданий получена"], ["a2", `${n} ${plural(n,"этап","этапа","этапов")} в журнале`]], 2600); }
+  };
+  stop.textContent = "Отмена"; act.append(ok);
+}
+
+/* ---------- FX ---------- */
+function announce(lines, ms = 3000, rays = false){
+  const a = $("announce"); a.textContent = "";
+  for (const [cls, txt] of lines){ const d = el("div", cls, txt); d.style.animationDuration = ms + "ms"; a.append(d); }
+  if (rays){ const r = el("div","rays"); $("fx").append(r); setTimeout(() => r.remove(), 4000); }
+  clearTimeout(announce.t); announce.t = setTimeout(() => { a.textContent = ""; }, ms + 100);
+}
+function floater(text, x, y, cls){ const f = el("div","floater" + (cls ? " " + cls : ""), text); f.style.left = x + "px"; f.style.top = y + "px"; $("fx").append(f); setTimeout(() => f.remove(), 1900); }
+function sparks(x, y){
+  const w = el("div","sparks"); w.style.left = x + "px"; w.style.top = y + "px";
+  for (let i = 0; i < 18; i++){ const s = el("i"), a = Math.random() * Math.PI * 2, r = 40 + Math.random() * 60;
+    s.style.setProperty("--dx", Math.cos(a) * r + "px"); s.style.setProperty("--dy", Math.sin(a) * r - 20 + "px"); s.style.animationDelay = Math.random() * .15 + "s"; w.append(s); }
+  $("fx").append(w); setTimeout(() => w.remove(), 1300);
+}
+const toastQ = []; let toasting = false;
+function runToasts(){
+  if (toasting || !toastQ.length) return;
+  toasting = true; const a = toastQ.shift();
+  const t = el("div","toast");
+  const sh = document.createElementNS("http://www.w3.org/2000/svg","svg"); sh.setAttribute("width","40"); sh.setAttribute("height","46");
+  const u = document.createElementNS("http://www.w3.org/2000/svg","use"); u.setAttribute("href","#shield"); sh.append(u);
+  const tx = el("div"); tx.append(el("small", null, "Получено достижение"), el("b", null, a.name), el("small", null, a.desc));
+  t.append(sh, tx, el("span","pts", String(a.pts)));
+  $("fx").append(t); sfx.ach();
+  setTimeout(() => { t.remove(); toasting = false; runToasts(); }, 4700);
+}
+
+/* ---------- embers ---------- */
+(function embers(){
+  const c = $("embers"), ctx = c.getContext("2d");
+  if (!ctx || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  let W, H, P = [], raf = 0, dpr = Math.min(2, window.devicePixelRatio || 1);
+  const size = () => { W = c.width = innerWidth * dpr; H = c.height = innerHeight * dpr; };
+  size(); addEventListener("resize", size);
+  const mk = y => ({ x:Math.random()*W, y:y ?? H + Math.random()*H*.3, r:(Math.random()*1.6 + .6)*dpr, vy:(Math.random()*.35 + .15)*dpr, vx:(Math.random()-.5)*.2*dpr, ph:Math.random()*6.28, life:Math.random() });
+  for (let i = 0; i < 38; i++) P.push(mk(Math.random()*H));
+  const tick = () => {
+    ctx.clearRect(0,0,W,H);
+    for (const p of P){
+      p.y -= p.vy; p.ph += .02; p.x += p.vx + Math.sin(p.ph)*.25*dpr;
+      if (p.y < -10) Object.assign(p, mk());
+      const a = Math.max(0, Math.min(1, p.y / H)) * .7;
+      const g = ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*4);
+      g.addColorStop(0, `rgba(255,190,90,${a})`); g.addColorStop(.4, `rgba(255,110,30,${a*.45})`); g.addColorStop(1, "rgba(255,80,0,0)");
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(p.x,p.y,p.r*4,0,6.28); ctx.fill();
+    }
+    raf = requestAnimationFrame(tick);
+  };
+  tick();
+  document.addEventListener("visibilitychange", () => { if (document.hidden) cancelAnimationFrame(raf); else tick(); });
+})();
+
+/* ---------- wiring & boot ---------- */
+$("newBtn").onclick = () => openEditor(null);
+$("completeBtn").onclick = complete;
+$("abandonBtn").onclick = abandon;
+$("briefBtn").onclick = () => openBrief();
+$("riddleBtn").onclick = () => { $("rTitle").value = ""; $("rNote").value = ""; $("rToday").checked = false; $("rCraft").checked = !!pathOf("craft"); $("rCraft").parentElement.hidden = !pathOf("craft"); $("riddleDlg").showModal(); $("rTitle").focus(); };
+$("rCancel").onclick = () => $("riddleDlg").close();
+$("riddleForm").addEventListener("submit", ev => {
+  ev.preventDefault();
+  const t = $("rTitle").value.trim(); if (!t){ $("rTitle").focus(); return; }
+  const period = $("rToday").checked ? "day" : "week";
+  const rp = pathOf("riddle") ? "riddle" : "";
+  const maxOrd = Math.max(-1, ...state.quests.filter(x => x.period === period).map(x => x.ord));
+  const q = { id:uid(), title:t, desc:$("rNote").value.trim(), period, zone:"Вопросы практики", path:rp, path2:$("rCraft").checked && pathOf("craft") ? "craft" : "",
+    diff:1, objectives:[{ t:"Найти надёжный источник", need:1, have:0 }, { t:"Прочитать и разобраться", need:1, have:0 }, { t:"Записать суть в 2–3 предложениях", need:1, have:0 }],
+    due:"", repeat:false, tracked:true, focus:false, created:Date.now(), status:"active", doneAt:null, pkey:periodStart(period), ord:maxOrd + 1, carried:0, parentId:null };
+  if (!q.path){ q.path = q.path2; q.path2 = ""; }
+  state.quests.push(q);
+  $("riddleDlg").close(); commit(); ui.tab = period; ui.sel = q.id; ui.anim = true; render();
+  sfx.accept(); announce([["a1", "Вопрос записан"], ["a2", t]], 2200);
+});
+$("syncBtn").onclick = () => {
+  if (syncState.provider === "gh" || (!dbRef && !(window.claude && window.claude.use))){ if (dbRef && syncState.mode !== "ok") pullNow(); openGhDialog(); return; }
+  if (dbRef) pullNow(); else setStatus(syncState.mode === "local" ? $("syncBtn").title : "");
+};
+$("soundBtn").onclick = () => { ui.sound = !ui.sound; try { localStorage.setItem(LS_KEY + ".sound", ui.sound ? "1" : "0"); } catch(e){} soundIcon(); };
+const local = loadLocal();
+state = normalize(local || {});
+base = (window.claude && window.claude.use && !loadGh()) ? loadBase() : null;
+rebuildSnap();
+// one-time: add the «Испытание» path and move exam quests onto it
+try {
+  if (!localStorage.getItem(LS_KEY + ".mig.trial")){
+    if (!state.paths.some(p => p.id === "trial")){
+      const i = state.paths.findIndex(p => p.id === "craft");
+      state.paths.splice(i + 1, 0, { id:"trial", name:"Испытание", desc:"Подготовка к экзамену по медицине боли", color:"#9a7b12", goal:0, u:0 });
+      const cr = state.paths.find(p => p.id === "craft"); if (cr && cr.desc === "Профессия: клиника, экзамены, наука") cr.desc = "Профессия: клиника, пациенты, наука";
+      const rx = /экзам|алголог|древ[оа] познани|испытани|аттестац|аккредит/i;
+      for (const q of state.quests){
+        if (q.status !== "active" || !(rx.test(q.zone) || rx.test(q.title))) continue;
+        const old = qPaths(q).filter(x => x !== "trial");
+        q.path = "trial"; q.path2 = old[0] || "craft";
+      }
+      commit();
+    }
+    localStorage.setItem(LS_KEY + ".mig.trial", "1");
+  }
+} catch(e){}
+// one-time: add the «Загадки» path for questions met in practice
+try {
+  if (!localStorage.getItem(LS_KEY + ".mig.riddle")){
+    if (!state.paths.some(p => p.id === "riddle")){
+      const i = state.paths.findIndex(p => p.id === "trial");
+      state.paths.splice(i >= 0 ? i + 1 : Math.min(1, state.paths.length), 0, { ...RIDDLE_PATH, u:0 });
+      commit();
+    }
+    localStorage.setItem(LS_KEY + ".mig.riddle", "1");
+  }
+} catch(e){}
+// one-time: «Загадки» / «Пытливый ум» → «Жажда знаний»
+try {
+  if (!localStorage.getItem(LS_KEY + ".mig.riddle3")){
+    const rp = state.paths.find(p => p.id === "riddle"); let ch = false;
+    if (rp && (rp.name === "Загадки" || rp.name === "Пытливый ум")){ rp.name = "Жажда знаний"; ch = true; }
+    for (const q of state.quests) if (q.zone === "Загадки практики"){ q.zone = "Вопросы практики"; ch = true; }
+    if (ch) commit();
+    localStorage.setItem(LS_KEY + ".mig.riddle3", "1");
+  }
+} catch(e){}
+// one-time rename of the default professional path
+try {
+  if (!localStorage.getItem(LS_KEY + ".mig.craft")){
+    const cp = state.paths.find(p => p.id === "craft");
+    if (cp && cp.name === "Ремесло"){ cp.name = "Целительство"; commit(); }
+    localStorage.setItem(LS_KEY + ".mig.craft", "1");
+  }
+} catch(e){}
+try { ui.sound = localStorage.getItem(LS_KEY + ".sound") !== "0"; } catch(e){}
+if (refreshRepeats()) commit();
+soundIcon(); render();
+connect();
+setInterval(() => { if (refreshRepeats()){ commit(); render(); } }, 60000);
+document.addEventListener("visibilitychange", () => { if (!document.hidden){ if (refreshRepeats()) commit(); render(); maybeBrief(); pullNow(); } });
+addEventListener("focus", () => { if (Date.now() - (syncState.at || 0) > 20000) pullNow(); });
+addEventListener("pagehide", () => { if (dbRef && sig(state) !== sig(base || {})) flush(); });
+})();
+</script>
+</body>
+</html>
